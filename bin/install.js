@@ -157,7 +157,11 @@ function install() {
     log(`\n[dry-run] No files written. Remove --dry-run to install.`);
   } else {
     log(`\nSlopBuster installed — ${total} files → ${targetPrefix}`);
-    log(`\nOpen Claude Code and run /sb:help to get started.`);
+    log(`\nQuick start:`);
+    log(`  1. Open Claude Code in your project`);
+    log(`  2. /sb:init     — initialize SlopBuster`);
+    log(`  3. /sb:plan     — write your first constraint-first plan`);
+    log(`  4. /sb:help     — full command reference`);
   }
 }
 
