@@ -9,6 +9,17 @@ Create a constraint-first plan for a phase.
 If $ARGUMENTS provided: use as the phase reference (name or number).
 If not: read `.slopbuster/STATE.md` for the current phase. If STATE.md is missing, tell the user to run `/sb:init` first.
 
+**State conflict check:** If STATE.md shows `# checkpoint_at:` is set, a plan is mid-execution. Show:
+```
+⚠ APPLY is in progress (checkpoint: [task-name]).
+  Current plan: [plan-path]
+  Continue with: /sb:apply [plan-path]
+
+  Creating a new plan is fine but will not advance the current one.
+  Proceeding with new plan creation.
+```
+Then continue — do not block. The developer may be planning the next plan while APPLY is paused.
+
 Read `.slopbuster/PROJECT.md` for the project's core value — you'll need it for step 3b.
 
 ### 2. Determine plan number
