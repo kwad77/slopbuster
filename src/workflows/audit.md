@@ -2,11 +2,22 @@
 
 Run an enterprise architectural audit on a plan.
 
-This workflow only runs when `enterprise_audit.enabled: true` in `.slopbuster/config.md`.
+## Steps
+
+### 1. Check if enabled
+
+Read `.slopbuster/config.md`.
+
+If `enterprise_audit.enabled: false`:
+- Show: `⛔ Enterprise audit is disabled. Enable with: /sb:config enterprise_audit.enabled true`
+- Stop.
+
+### 2. Load plan
+
+Read PLAN.md at the path from $ARGUMENTS or STATE.md current plan.
+Read GATE.md if it exists in the same phase directory.
 
 ## Audit Dimensions
-
-Read PLAN.md and GATE.md (if it exists) for the plan being audited.
 
 ### 1. Architectural Fit
 
@@ -93,3 +104,7 @@ Show the clearance status clearly:
   or
 [AUDIT ⛔] Plan blocked — [N] finding(s) require remediation before APPLY
 ```
+
+Update STATE.md:
+- Last: timestamp + "Audit complete: [NN]-[PP]-PLAN.md — [CLEARED | BLOCKED]"
+- Next: `/sb:apply [plan-path]` if cleared, or `/sb:plan` (fix findings) if blocked
