@@ -42,9 +42,11 @@ The resume workflow always cross-checks STATE.md against disk and surfaces discr
 
 For plans with many tasks across many files:
 
-1. Execute wave 1 tasks → checkpoint written → confirm with user
-2. Execute wave 2 tasks → checkpoint written → confirm with user
+1. Execute wave 1 tasks → checkpoint written automatically at wave boundary
+2. Execute wave 2 tasks → checkpoint written automatically at wave boundary
 3. If context grows large: use `/sb:pause`, resume in a new session via `/sb:resume`
+
+For plans requiring human confirmation at each wave: set `autonomous: false` in PLAN.md frontmatter. APPLY will pause before each wave and wait for re-run.
 
 The checkpoint system makes this lossless.
 
