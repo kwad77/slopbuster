@@ -77,7 +77,21 @@ For each phase named in step 2c, create:
 
 Phase slug: lowercase, kebab-case, max 30 characters.
 
-### 9. Confirm
+### 9. Git integration
+
+Ask: "Should I commit `.slopbuster/` to this repo? Team projects benefit from tracking it — everyone sees the current phase and plan history. Solo projects can keep it local."
+
+**If yes (commit):**
+- Check if `.gitignore` has a `.slopbuster` entry and remove it if so
+- Show: "`.slopbuster/` will be tracked. Run `git add .slopbuster/` when ready."
+
+**If no (ignore):**
+- Check if `.gitignore` exists. If so, append `.slopbuster/`. If not, create it with `.slopbuster/`.
+- Show: "`.slopbuster/` added to `.gitignore` — stays local to this machine."
+
+If the project is not a git repo, skip this step silently.
+
+### 10. Confirm
 
 ```
 ✓ SlopBuster initialized
@@ -85,6 +99,7 @@ Phase slug: lowercase, kebab-case, max 30 characters.
 Project:    [name]
 Core value: [core value]
 Phases:     [N phases created]
+Git:        [tracked | ignored]
 
 Next:
   /sb:discuss [phase]   — surface assumptions before planning (recommended)
