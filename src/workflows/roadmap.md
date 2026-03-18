@@ -40,10 +40,9 @@ Next: /sb:discuss {slug} or /sb:plan {slug}
 
 1. Find the phase in ROADMAP.md
 2. Check if the phase directory contains any PLAN.md files
-3. If plans exist: warn the user — "This phase has [N] plans. Removing it from the roadmap will not delete the files."
-4. Confirm with user
-5. Remove the phase entry from ROADMAP.md
-6. Do NOT delete the phase directory or any plan files — they are historical record
+3. If plans exist: show — "This phase has [N] plans. Removing from roadmap — files preserved."
+4. Remove the phase entry from ROADMAP.md
+5. Do NOT delete the phase directory or any plan files — they are historical record
 
 ```
 Phase removed from roadmap: {NN}-{slug}

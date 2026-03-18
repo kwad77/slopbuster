@@ -102,9 +102,11 @@ Type `override` when APPLY is blocked to bypass (logged to STATE.md Decisions).
 ## Loop States
 
 ```
-PLAN ◉ ──▶ GATE ── ──▶ APPLY ○ ──▶ UNIFY ○    [Planning]
-PLAN ✓ ──▶ GATE ⚠  ──▶ APPLY ○ ──▶ UNIFY ○    [Gate pending]
-PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ◉ ──▶ UNIFY ○    [Applying]
-PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ✓ ──▶ UNIFY ◉    [Unifying]
-PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ✓ ──▶ UNIFY ✓    [Complete]
+PLAN ◉ ──▶ GATE ──      ──▶ APPLY ○ ──▶ UNIFY ○    [Planning]
+PLAN ✓ ──▶ GATE ⚠       ──▶ APPLY ○ ──▶ UNIFY ○    [Gate pending]
+PLAN ✓ ──▶ GATE ✓       ──▶ APPLY ◉ ──▶ UNIFY ○    [Applying]
+PLAN ✓ ──▶ GATE ✓       ──▶ APPLY ✓ ──▶ UNIFY ◉    [Unifying]
+PLAN ✓ ──▶ GATE ✓       ──▶ APPLY ✓ ──▶ UNIFY ✓    [Complete]
+PLAN ✓ ──▶ GATE ✓ auto  ──▶ APPLY ◉ ──▶ UNIFY ○    [Auto-cleared — below all thresholds]
+PLAN ✓ ──▶ GATE ✓ off   ──▶ APPLY ◉ ──▶ UNIFY ○    [Gate disabled in config]
 ```
