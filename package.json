@@ -1,13 +1,21 @@
 {
   "name": "slopbuster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Constraint-first AI-assisted development for Claude Code",
   "bin": {
     "slopbuster": "bin/install.js"
   },
-  "keywords": ["claude", "claude-code", "ai", "development", "constraints", "framework"],
+  "files": [
+    "bin/",
+    "src/"
+  ],
+  "keywords": ["claude", "claude-code", "ai", "development", "constraints", "framework", "gate", "plan"],
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kwad77/slopbuster"
   }
 }
