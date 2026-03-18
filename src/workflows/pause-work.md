@@ -7,6 +7,8 @@ Pause work cleanly and create a session handoff.
 ### 1. Load current state
 
 Read `.slopbuster/STATE.md`.
+If STATE.md does not exist: "SlopBuster is not initialized here. Nothing to pause. Run `/sb:init` to start."
+
 If a plan is active, read the current PLAN.md.
 
 ### 2. Capture reason
