@@ -43,8 +43,17 @@ Next: /sb:discuss {slug} or /sb:plan {slug}
 3. If plans exist: show — "This phase has [N] plans. Removing from roadmap — files preserved."
 4. Remove the phase entry from ROADMAP.md
 5. Do NOT delete the phase directory or any plan files — they are historical record
+6. Update STATE.md: Last = timestamp + "Phase removed from roadmap: {NN}-{slug}"
 
 ```
 Phase removed from roadmap: {NN}-{slug}
 Note: .slopbuster/phases/{NN}-{slug}/ was preserved.
 ```
+
+## Subcommand: reorder
+
+1. Read ROADMAP.md and display current phase sequence
+2. User provides new ordering (e.g., "move phase 03 before 01")
+3. Renumber phases in ROADMAP.md to reflect new order
+4. Update STATE.md phase sequence if current phase number changes
+5. Show updated roadmap view
