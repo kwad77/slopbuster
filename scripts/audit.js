@@ -319,14 +319,29 @@ const researchNeedsEdit = cmdTools('research').includes('Edit');
 if (!researchNeedsEdit) issue('commands/research.md missing Edit (research.md updates STATE.md)');
 else pass('commands/research.md has Edit for STATE.md update');
 
+// milestone: workflow creates phase dirs (Bash), checks SUMMARY.md files (Glob), updates ROADMAP.md/STATE.md (Edit)
+const milestoneContent = cmdTools('milestone');
+const milestoneNeedsEdit = milestoneContent.includes('Edit');
+const milestoneNeedsBash = milestoneContent.includes('Bash');
+const milestoneNeedsGlob = milestoneContent.includes('Glob');
+if (!milestoneNeedsEdit) issue('commands/milestone.md missing Edit (milestone.md updates ROADMAP.md and STATE.md)');
+else pass('commands/milestone.md has Edit for ROADMAP.md/STATE.md update');
+if (!milestoneNeedsBash) issue('commands/milestone.md missing Bash (milestone create makes phase directories)');
+else pass('commands/milestone.md has Bash for directory creation');
+if (!milestoneNeedsGlob) issue('commands/milestone.md missing Glob (milestone complete checks SUMMARY.md files)');
+else pass('commands/milestone.md has Glob for SUMMARY.md discovery');
+
 const toolAccuracyIssues = [
   !verifyNeedsEdit,
   !auditNeedsEdit,
   !pauseNeedsEdit,
   !researchNeedsEdit,
+  !milestoneNeedsEdit,
+  !milestoneNeedsBash,
+  !milestoneNeedsGlob,
 ].filter(Boolean).length;
 
-const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 4));
+const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 7));
 
 // ── Report ──────────────────────────────────────────────────────────────────
 

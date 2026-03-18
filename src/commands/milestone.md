@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit, Bash, Glob
 description: Create or manage project milestones
 ---
 
