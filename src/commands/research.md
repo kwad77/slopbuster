@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, WebSearch, WebFetch
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 description: Deploy a research agent for external information gathering
 ---
 

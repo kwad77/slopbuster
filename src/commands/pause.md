@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 description: Create a handoff and pause work cleanly
 ---
 

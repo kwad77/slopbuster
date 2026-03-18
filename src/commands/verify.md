@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 description: Guide manual user acceptance testing
 ---
 
