@@ -85,13 +85,20 @@ For each wave, execute tasks in the listed order. Within a wave, tasks are logic
 **For each task:**
 
 1. Show: `▶ [task name]`
-2. Read `<files>` — these are the only files this task should touch
-3. Read `<action>` carefully — pay attention to "what NOT to do" clauses
-4. Check `<boundaries>` — never touch DO NOT CHANGE files, stay within SCOPE LIMITS
-5. Execute the action
-6. Run the `<verify>` check exactly as written
-7. If verify passes: show `✓ [task name]` — note which AC this satisfies per `<done>`
-8. If verify fails: stop immediately, show the failure output and the exact verify command that failed. Write `# checkpoint_at: [this-task-name]` to STATE.md so APPLY can be re-run after the fix.
+2. Read `type` attribute — `auto` (Claude executes) or `manual` (user executes)
+3. **If `type="manual"`:**
+   - Show the `<action>` content as instructions for the user
+   - Show: `⏸ Manual task — complete the steps above, then run /sb:apply [plan-path] to continue`
+   - Write `# checkpoint_at: [this-task-name]` to STATE.md
+   - Stop execution here. APPLY resumes from this task when re-run.
+4. **If `type="auto"`:**
+   - Read `<files>` — these are the only files this task should touch
+   - Read `<action>` carefully — pay attention to "what NOT to do" clauses
+   - Check `<boundaries>` — never touch DO NOT CHANGE files, stay within SCOPE LIMITS
+   - Execute the action
+   - Run the `<verify>` check exactly as written
+   - If verify passes: show `✓ [task name]` — note which AC this satisfies per `<done>`
+   - If verify fails: stop immediately, show the failure output and the exact verify command that failed. Write `# checkpoint_at: [this-task-name]` to STATE.md so APPLY can be re-run after the fix.
 
 **Respect `<boundaries>` at all times.** If a task would require touching a file in DO NOT CHANGE, stop and report it rather than proceeding.
 
