@@ -331,6 +331,15 @@ else pass('commands/milestone.md has Bash for directory creation');
 if (!milestoneNeedsGlob) issue('commands/milestone.md missing Glob (milestone complete checks SUMMARY.md files)');
 else pass('commands/milestone.md has Glob for SUMMARY.md discovery');
 
+// roadmap: workflow creates phase dirs (Bash), modifies ROADMAP.md/STATE.md (Edit)
+const roadmapContent = cmdTools('roadmap');
+const roadmapNeedsEdit = roadmapContent.includes('Edit');
+const roadmapNeedsBash = roadmapContent.includes('Bash');
+if (!roadmapNeedsEdit) issue('commands/roadmap.md missing Edit (roadmap.md updates ROADMAP.md and STATE.md)');
+else pass('commands/roadmap.md has Edit for ROADMAP.md/STATE.md update');
+if (!roadmapNeedsBash) issue('commands/roadmap.md missing Bash (roadmap add creates phase directories)');
+else pass('commands/roadmap.md has Bash for directory creation');
+
 const toolAccuracyIssues = [
   !verifyNeedsEdit,
   !auditNeedsEdit,
@@ -339,9 +348,11 @@ const toolAccuracyIssues = [
   !milestoneNeedsEdit,
   !milestoneNeedsBash,
   !milestoneNeedsGlob,
+  !roadmapNeedsEdit,
+  !roadmapNeedsBash,
 ].filter(Boolean).length;
 
-const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 7));
+const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 9));
 
 // ── Report ──────────────────────────────────────────────────────────────────
 

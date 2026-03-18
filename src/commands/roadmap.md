@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit, Bash
 description: View roadmap and manage phases
 ---
 
