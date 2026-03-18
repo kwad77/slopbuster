@@ -141,12 +141,14 @@ Options:
 Write # checkpoint_at: [this-task-name] to STATE.md.
 ```
 
-### 8. Checkpoints
+### 8. Checkpoints (recovery markers)
 
-Write `# checkpoint_at: [next-task-name]` to STATE.md before starting:
+Regardless of `autonomous` setting, write `# checkpoint_at: [next-task-name]` to STATE.md before starting:
 - The first task of wave 2 or higher
 - Any task where `checkpoint="true"` is set on the task element
 - Any task that modifies a file adjacent to a DO NOT CHANGE entry
+
+This is a recovery marker — it does NOT pause execution unless `autonomous: false` or the task is `type="manual"`. If the session crashes, re-running APPLY resumes from the checkpoint.
 
 After the task completes and verify passes: remove the `# checkpoint_at:` line from STATE.md.
 
