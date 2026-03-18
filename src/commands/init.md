@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Bash
+allowed-tools: Read, Write, Edit, Bash
 description: Initialize SlopBuster in this project
 ---
 

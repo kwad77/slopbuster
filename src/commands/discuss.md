@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 description: Articulate vision and surface assumptions before planning
 ---
 

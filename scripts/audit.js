@@ -340,6 +340,16 @@ else pass('commands/roadmap.md has Edit for ROADMAP.md/STATE.md update');
 if (!roadmapNeedsBash) issue('commands/roadmap.md missing Bash (roadmap add creates phase directories)');
 else pass('commands/roadmap.md has Bash for directory creation');
 
+// discuss: workflow writes DISCUSS-*.md (new) and updates STATE.md (existing) → needs Edit
+const discussNeedsEdit = cmdTools('discuss').includes('Edit');
+if (!discussNeedsEdit) issue('commands/discuss.md missing Edit (discuss-phase.md updates STATE.md)');
+else pass('commands/discuss.md has Edit for STATE.md update');
+
+// init: workflow modifies existing .gitignore → needs Edit
+const initNeedsEdit = cmdTools('init').includes('Edit');
+if (!initNeedsEdit) issue('commands/init.md missing Edit (init-project.md modifies .gitignore)');
+else pass('commands/init.md has Edit for .gitignore modification');
+
 const toolAccuracyIssues = [
   !verifyNeedsEdit,
   !auditNeedsEdit,
@@ -350,9 +360,11 @@ const toolAccuracyIssues = [
   !milestoneNeedsGlob,
   !roadmapNeedsEdit,
   !roadmapNeedsBash,
+  !discussNeedsEdit,
+  !initNeedsEdit,
 ].filter(Boolean).length;
 
-const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 9));
+const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 11));
 
 // ── Report ──────────────────────────────────────────────────────────────────
 
