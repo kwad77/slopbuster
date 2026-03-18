@@ -44,9 +44,8 @@ Verify GATE.md exists at the expected path. If missing, warn but continue.
 Read the `<constraints>` section of PLAN.md.
 
 If `<constraints>` is empty (no Gate ran, no override):
-- Show a warning: "⚠ No constraints were injected into this plan."
-- Ask user to confirm they want to proceed without constraints.
-- If they confirm: continue.
+- Show a warning: "⚠ No constraints were injected into this plan. Proceeding without constraint contract."
+- Continue. Do not block — the user already chose to proceed by running APPLY.
 
 **Internalize the constraints before executing any task.**
 The `<constraints>` section contains the developer's exact words. Execute against them — not your own interpretation of the plan.
@@ -92,7 +91,7 @@ For each wave, execute tasks in the listed order. Within a wave, tasks are logic
 5. Execute the action
 6. Run the `<verify>` check exactly as written
 7. If verify passes: show `✓ [task name]` — note which AC this satisfies per `<done>`
-8. If verify fails: stop immediately, show the failure output, ask user how to proceed
+8. If verify fails: stop immediately, show the failure output and the exact verify command that failed. Write `# checkpoint_at: [this-task-name]` to STATE.md so APPLY can be re-run after the fix.
 
 **Respect `<boundaries>` at all times.** If a task would require touching a file in DO NOT CHANGE, stop and report it rather than proceeding.
 
@@ -116,7 +115,7 @@ Final verification:
   ✗ [check 3] — [failure detail]
 ```
 
-If any verification item fails: do not declare complete. Report the failure and ask the user.
+If any verification item fails: do not declare complete. Report the failure with the exact output. Do not update STATE.md to APPLY ✓ — leave the loop position as APPLY ◉ so the issue is visible on next `/sb:progress`.
 
 ### 9. Update STATE.md
 
