@@ -44,7 +44,13 @@ After fix execution, run verify-work workflow against the acceptance criteria th
 
 Use the same test cards as the original verify run.
 
-### 6. Close
+### 6. Update STATE.md
+
+Update:
+- Last: timestamp + "Fix complete: [N] issues resolved / [N] still open"
+- Next: `/sb:unify [original-plan-path]` if all resolved, or `/sb:fix [PP]` if issues remain
+
+### 7. Close
 
 If all previously-failing tests now pass:
 ```
