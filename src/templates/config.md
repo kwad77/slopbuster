@@ -1,9 +1,5 @@
 # SlopBuster Config
 
-project:
-  name: [project-name]
-  version: 0.1.0
-
 gate:
   enabled: true
   thresholds:
