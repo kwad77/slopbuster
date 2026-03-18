@@ -7,6 +7,6 @@ View and manage the project roadmap.
 
 Arguments: $ARGUMENTS
 
-Subcommands: (none = view), add [phase-name], remove [phase-name]
+Subcommands: (none = view), add [phase-name], remove [phase-name], reorder
 
 Follow the workflow at @src/workflows/roadmap.md

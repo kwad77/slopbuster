@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 description: Run the circuit breaker on a plan
 ---
 

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit, Bash
 description: Reconcile plan vs actual and close the loop
 ---
 

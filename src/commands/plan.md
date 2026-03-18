@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit, Glob
 description: Create a constraint-first plan for a phase
 ---
 

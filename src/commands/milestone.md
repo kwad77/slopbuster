@@ -7,7 +7,7 @@ Manage project milestones.
 
 Arguments: $ARGUMENTS
 
-Subcommands: create [name], complete [name], discuss [name]
+Subcommands: view (default), create [name], complete [name], discuss [name]
 
 If no arguments provided, list current milestones from ROADMAP.md.
 

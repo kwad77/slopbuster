@@ -24,3 +24,5 @@ Settings reference:
 | `enterprise_audit.enabled` | false | Enable /sb:audit command |
 | `preferences.auto_commit` | false | Auto-commit after UNIFY completes |
 | `preferences.wave_execution` | true | Show wave grouping hints during APPLY |
+
+4. After applying a change: show the updated setting and its new value. No restart required — changes take effect on the next command run.
