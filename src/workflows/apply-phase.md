@@ -94,6 +94,20 @@ If `preferences.wave_execution: false`, show a flat task list without wave group
 
 ### 7. Execute tasks by wave
 
+Read `autonomous` from PLAN.md frontmatter (default: `true`).
+
+**If `autonomous: false`:** Before executing each wave (except wave 1), pause and show:
+```
+⏸ Wave [N] ready — [N] tasks
+  [task name]  [files]
+  ...
+Run /sb:apply [plan-path] to execute this wave.
+```
+Write `# checkpoint_at: [first-task-of-wave]` to STATE.md and stop.
+Re-running APPLY will resume from that wave. Set `autonomous: true` in PLAN.md to disable this behavior.
+
+**If `autonomous: true` (default):** Execute all waves without pausing.
+
 For each wave, execute tasks in the listed order. Within a wave, tasks are logically independent.
 
 **For each task:**

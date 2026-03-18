@@ -31,6 +31,8 @@ gate_triggered_by: ""
 
 **wave:** Plans in the same phase with wave 1 are independent. Wave 2 depends on wave 1 completing first. Wave is a planning hint — it tells you which plans can run in parallel sessions, not an automatic scheduler.
 
+**autonomous:** When `true` (default), APPLY executes all waves without pausing. When `false`, APPLY pauses before each wave boundary and waits for re-run — useful for risky plans where human confirmation between waves is required. Set to `false` only when actively watching execution.
+
 ### `<constraints>` — FIRST SECTION, ALWAYS
 
 This is the execution contract. Claude reads this before any task.
