@@ -46,6 +46,8 @@ Every unit of work runs through this loop. No shortcuts.
 ```bash
 npx slopbuster --global    # Install to ~/.claude/ (all projects)
 npx slopbuster --local     # Install to ./.claude/ (this project only)
+npx slopbuster --dry-run   # Preview what would be installed
+npx slopbuster --verbose   # Show each file as it installs
 npx slopbuster --uninstall # Remove
 ```
 
@@ -158,7 +160,7 @@ After `/sb:init`, your project gets:
         ├── 01-01-PLAN.md     # Constraint-first plan
         ├── 01-01-GATE.md     # Circuit breaker clearance artifact
         ├── 01-01-SUMMARY.md  # UNIFY output
-        └── 01-01-UAT.md      # Verify issues (if any)
+        └── 01-01-UAT-ISSUES.md  # Verify issues (if any)
 ```
 
 ---
