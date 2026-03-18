@@ -172,6 +172,13 @@ If any verification item fails: do not declare complete. Report the failure with
 - Update Last: timestamp + "Apply complete: [NN]-[PP]-PLAN.md"
 - Update Next: `/sb:unify .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-PLAN.md`
 
+---
+
+## References
+
+- Checkpoint system: @src/references/checkpoints.md
+- Context and session management: @src/references/context-management.md
+
 ### 11. Confirm
 
 ```

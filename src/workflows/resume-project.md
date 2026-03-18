@@ -63,9 +63,12 @@ Next: [exact command]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### 7. Ask to proceed
+### 7. Proceed
 
-"Ready to continue with [next command]?"
+**If `gate_pending` is set:** Load `@src/workflows/gate-workflow.md` and begin immediately. Do not ask.
 
-If yes: load the appropriate workflow and proceed.
-If no: wait for user direction.
+**If `checkpoint_at` is set:** Load `@src/workflows/apply-phase.md` and begin immediately. Do not ask.
+
+**If neither signal is set and a clear Next command is shown:** Begin executing the next command immediately. Do not ask.
+
+**If state is genuinely ambiguous** (STATE.md missing, conflicting signals, or no discernible Next): ask the user what they would like to do next.

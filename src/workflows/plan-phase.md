@@ -121,3 +121,10 @@ PLAN ✓ ──▶ GATE ✓ auto ──▶ APPLY ○ ──▶ UNIFY ○
 
 Next: /sb:apply .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-PLAN.md
 ```
+
+---
+
+## References
+
+- Loop phases and state machine: @src/references/loop-phases.md
+- PLAN.md format guide: @src/references/plan-format.md

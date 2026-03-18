@@ -1,25 +1,19 @@
 ```
- ____  _     ___  ____  ____  _  _  ____  ____  ____  ____
-/ ___\/ \   /   \/  __\/  _ \/ \/ \/  __\/  __\/  __\/  __\
-|    \| |   | / ||  \/|| / \|| \/ ||  \/||  \/||  \/||  \/|
-\___ || |_/\|   ||  __/| \_/|| \/ ||  __/|  __/|    /|    /
-\____/\____/\_/\_|_|   \____/\_/\_/\_/   \_/   \_/\_\\_/\_\
+███████╗██╗      ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗████████╗███████╗██████╗
+██╔════╝██║     ██╔═══██╗██╔══██╗██╔══██╗██║   ██║██╔════╝╚══██╔══╝██╔════╝██╔══██╗
+███████╗██║     ██║   ██║██████╔╝██████╔╝██║   ██║███████╗   ██║   █████╗  ██████╔╝
+╚════██║██║     ██║   ██║██╔═══╝ ██╔══██╗██║   ██║╚════██║   ██║   ██╔══╝  ██╔══██╗
+███████║███████╗╚██████╔╝██║     ██████╔╝╚██████╔╝███████║   ██║   ███████╗██║  ██║
+╚══════╝╚══════╝ ╚═════╝ ╚═╝     ╚═════╝  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
 ```
-> *Stop shipping slop.*
 
-SlopBuster is a Claude Code slash command framework for **constraint-first AI-assisted development**. It sits between your plan and Claude's execution with a circuit breaker — the Gate — that refuses to let Claude touch a file until you've answered five architectural questions and signed your name to the constraints.
+> **Stop shipping slop.**
 
-Your words. Verbatim. Into the plan. Every time.
+Claude writes fast. That's the problem.
 
----
+Give it a vague prompt and it makes 47 architectural decisions before you finish your coffee. Auth strategy, schema shape, error handling philosophy, rollback plan — all silently assumed. You review the diff and it *looks right*, which is the most dangerous thing a diff can do.
 
-## The Problem
-
-AI-assisted development is execution-first by default. You describe what to build, Claude builds it. Nobody stops to define what the plan *cannot* do — the blast radius, the performance ceiling, the rollback path if it fails halfway through.
-
-The result is architectural drift, silent assumptions, and slop.
-
-SlopBuster is the circuit breaker between intent and execution.
+SlopBuster is the circuit breaker between your idea and Claude's execution. It forces the constraints to exist before the code does. Your words. Verbatim. Every time.
 
 ---
 
@@ -29,29 +23,55 @@ SlopBuster is the circuit breaker between intent and execution.
 PLAN ──▶ GATE ──▶ APPLY ──▶ UNIFY
 ```
 
-Every unit of work runs through this loop. No shortcuts.
+Four phases. No shortcuts. Every unit of work completes the full loop.
 
-**PLAN** — Define what to build and why. Acceptance criteria first.
+**PLAN** — You define what to build. Acceptance criteria, files touched, blast radius. Claude writes a constraint-first plan. `<constraints>` is visibly empty — a signal that the gate hasn't run.
 
-**GATE** — The circuit breaker. Fires on: >5 files, new dependencies, schema changes, API changes, auth changes. When it fires, you answer 5 questions. Your answers are injected verbatim into the plan's `<constraints>` section — the first thing Claude reads before executing any task. Simple plans auto-clear. Complex plans block until you've thought it through.
+**GATE** — The circuit breaker. It evaluates five triggers against your plan. If any fire, it asks you five architectural questions. Your exact answers — not a summary, not a paraphrase — are injected verbatim into the `<constraints>` section at the top of the plan. Then an 8-point pitfall checklist runs. Simple plans clear the gate automatically. Complex plans block until you've thought it through.
 
-**APPLY** — Execute against *your* constraints, not Claude's interpretation of them. Tasks run in waves. Checkpoints protect against mid-run interruptions.
+**APPLY** — Claude executes against *your* constraints, not its own interpretation. Tasks run in waves. Checkpoints protect against mid-run interruptions. If a task would touch a file marked DO NOT CHANGE, it stops dead.
 
-**UNIFY** — Reconcile plan vs actual. Document scope drift. Close the loop. Every loop ends with a SUMMARY.md.
+**UNIFY** — Reconcile plan vs actual. Document scope drift. Write SUMMARY.md. Close the loop. At no point did Claude make an unconstrained architectural decision.
+
+---
+
+## The Gate
+
+Five triggers. Any one fires, you answer five questions.
+
+| Trigger | What it catches |
+|---------|----------------|
+| Plan modifies > 5 files | Scope too wide to be safe without a contract |
+| New external dependencies | Package surface you haven't audited |
+| Database schema changes | Migrations you can't easily roll back |
+| API contract changes | Breaking changes to things other code depends on |
+| Auth or session changes | Security surface that warrants explicit thought |
+
+**The five questions:**
+
+1. **Connectivity** — What systems does this touch? What's the blast radius?
+2. **Performance** — Latency targets? Indexes? Memory profile?
+3. **Concurrency** — Idempotency? Race conditions? Locking?
+4. **Security** — Protected vs. public? Validation? Secrets?
+5. **Rollback** — If this fails mid-execution, what's the path back?
+
+Your answers, verbatim, become the `<constraints>` block. Claude reads them before executing a single task. You can't forget to tell Claude what you decided — it's in the contract.
+
+Then the 8-point pitfall checklist: business context alignment, schema backward compatibility, idempotency, error handling, YAGNI, state encapsulation, testing strategy, alternatives considered.
 
 ---
 
 ## Install
 
 ```bash
-npx slopbuster --global    # Install to ~/.claude/ (all projects)
-npx slopbuster --local     # Install to ./.claude/ (this project only)
+npx slopbuster --global    # Install to ~/.claude/ — works in every project
+npx slopbuster --local     # Install to ./.claude/ — this project only
 npx slopbuster --dry-run   # Preview what would be installed
 npx slopbuster --verbose   # Show each file as it installs
 npx slopbuster --uninstall # Remove
 ```
 
-No build step. No compilation. SlopBuster is markdown — it installs as slash command files that Claude Code reads directly.
+No build step. No compilation. No runtime. SlopBuster is markdown files that Claude Code reads directly. The installer copies them into place and rewrites path references. That's the whole system.
 
 Then open Claude Code and run:
 
@@ -64,84 +84,70 @@ Then open Claude Code and run:
 ## Quick Start
 
 ```
-/sb:init        Initialize SlopBuster in your project
-/sb:discuss     Surface assumptions before writing a plan (recommended)
-/sb:plan        Write a constraint-first plan
-/sb:gate        Run the circuit breaker
-/sb:apply       Execute against your constraints
-/sb:unify       Close the loop
+/sb:init        Scaffold .slopbuster/ in your project (30 seconds)
+/sb:discuss     Surface assumptions before writing the plan
+/sb:plan        Write a constraint-first plan — Gate thresholds evaluated
+/sb:gate        Run the circuit breaker — answer 5 questions
+/sb:apply       Execute against your constraints, not Claude's assumptions
+/sb:unify       Close the loop — SUMMARY.md written, decisions recorded
 ```
 
----
+What this looks like in practice:
 
-## The Gate
-
-The Gate fires when any of these are true:
-
-| Trigger | Signal |
-|---------|--------|
-| Plan modifies > 5 files | `file-count` |
-| New external dependencies | `new-dependencies` |
-| Database schema changes | `database-schema` |
-| API contract changes | `api-contract` |
-| Auth or session changes | `auth-session` |
-
-When it fires, you answer **5 questions**:
-
-1. **Connectivity** — What systems does this plan touch? What's the blast radius?
-2. **Performance** — Latency targets? DB indexes? Memory profile?
-3. **Concurrency** — Write idempotency? Race conditions? Locking strategy?
-4. **Security** — Protected vs. public? Input validation? Secrets management?
-5. **Rollback** — If this fails mid-execution, what's the recovery path?
-
-Your exact answers — not a summary, not Claude's interpretation — are injected into `<constraints>` at the top of the plan. Claude executes against your words.
-
-Then an **8-point pitfall checklist** runs: Business context alignment, schema backward compatibility, idempotency, error handling, YAGNI, state encapsulation, testing strategy, alternatives considered.
+```
+/sb:init           → .slopbuster/ scaffolded
+/sb:plan           → PLAN.md created, <constraints> visibly empty
+/sb:apply          → ⛔ blocked — Gate hasn't run
+/sb:gate           → 5 questions, answers injected verbatim
+/sb:apply          → executes wave by wave, checkpointed
+/sb:unify          → loop closed, SUMMARY.md written
+/sb:progress       → tells you exactly where you are and what to do next
+```
 
 ---
 
 ## All 17 Commands
 
 ### Core Loop
-| Command | Purpose |
-|---------|---------|
+| Command | What it does |
+|---------|-------------|
 | `/sb:init` | Initialize SlopBuster in a project |
 | `/sb:plan [phase]` | Create a constraint-first plan |
 | `/sb:gate [plan-path]` | Run the circuit breaker |
 | `/sb:apply [plan-path]` | Execute a gate-cleared plan |
-| `/sb:unify [plan-path]` | Reconcile and close the loop |
+| `/sb:unify [plan-path]` | Reconcile plan vs actual, close the loop |
 
 ### Navigation
-| Command | Purpose |
-|---------|---------|
-| `/sb:progress` | Loop position + one next action |
-| `/sb:resume` | Restore context from STATE.md |
-| `/sb:pause [reason]` | Create handoff, pause cleanly |
-| `/sb:help` | Command reference |
+| Command | What it does |
+|---------|-------------|
+| `/sb:progress` | Current loop position + one next action |
+| `/sb:resume` | Restore full context from STATE.md and continue |
+| `/sb:pause [reason]` | Write handoff, stop cleanly |
+| `/sb:help` | Full command reference with frontmatter field docs |
 
 ### Pre-Planning
-| Command | Purpose |
-|---------|---------|
-| `/sb:discuss [phase]` | Articulate vision, surface assumptions |
-| `/sb:research [topic]` | Research agent for external information |
+| Command | What it does |
+|---------|-------------|
+| `/sb:discuss [phase]` | Articulate vision and surface assumptions before planning |
+| `/sb:research [topic]` | Deploy a research agent for external information |
 
 ### Roadmap
-| Command | Purpose |
-|---------|---------|
+| Command | What it does |
+|---------|-------------|
 | `/sb:milestone [name]` | Create or manage milestones |
 | `/sb:roadmap` | View roadmap, add/remove phases |
 
 ### Quality
-| Command | Purpose |
-|---------|---------|
-| `/sb:verify [scope]` | Guide manual acceptance testing |
+| Command | What it does |
+|---------|-------------|
+| `/sb:verify [scope]` | Guide manual user acceptance testing |
 | `/sb:fix [plan-number]` | Plan and execute fixes for UAT issues |
 | `/sb:audit [plan-path]` | Enterprise architectural audit |
 
 ### Config
-| Command | Purpose |
-|---------|---------|
-| `/sb:config` | View or modify SlopBuster settings |
+| Command | What it does |
+|---------|-------------|
+| `/sb:config` | View or modify gate thresholds and preferences |
 
 ---
 
@@ -151,52 +157,49 @@ After `/sb:init`, your project gets:
 
 ```
 .slopbuster/
-├── PROJECT.md          # Project name, core value, constraints
+├── PROJECT.md          # Project name, core value, stack, constraints
 ├── ROADMAP.md          # Milestones and phases
 ├── STATE.md            # Current loop position, decisions, resume point
 ├── config.md           # Gate thresholds, enterprise settings
 └── phases/
     └── 01-phase-name/
-        ├── 01-01-PLAN.md     # Constraint-first plan
-        ├── 01-01-GATE.md     # Circuit breaker clearance artifact
-        ├── 01-01-SUMMARY.md  # UNIFY output
-        └── 01-01-UAT-ISSUES.md  # Verify issues (if any)
+        ├── 01-01-PLAN.md         # Constraint-first plan
+        ├── 01-01-GATE.md         # Circuit breaker clearance artifact
+        ├── 01-01-SUMMARY.md      # UNIFY output — loop closed
+        └── 01-01-UAT-ISSUES.md   # Verify issues (if any)
 ```
+
+STATE.md is the session bridge. Under 80 lines. Always current. It's how `/sb:resume` drops you back exactly where you left off.
 
 ---
 
-## Why 17 Commands
+## PLAN.md Frontmatter
 
-PAUL has 27. GSD has 37. SlopBuster has 17.
+Two fields worth knowing:
 
-Fewer commands means better discoverability, less documentation debt, and less room for Claude to guess which command to run. Every command does one thing clearly.
+**`autonomous: true|false`** — When `false`, APPLY pauses before each wave and waits for re-run. Use this when you want human confirmation between execution waves. Default is `true` — run straight through.
+
+**`depends_on: []`** — List plans that must be unified before this one runs. APPLY blocks with a clear error if a dependency hasn't completed.
 
 ---
 
 ## How It Works
 
-SlopBuster installs as Claude Code slash commands — markdown files in `~/.claude/commands/sb/`. There is no runtime, no service, no compilation. When you run `/sb:plan`, Claude Code loads `~/.claude/commands/sb/plan.md` and executes the instructions inside. The workflows in `~/.claude/slopbuster-framework/workflows/` contain the logic. The templates in `~/.claude/slopbuster-framework/templates/` are the file scaffolding.
+SlopBuster installs as Claude Code slash commands — markdown files in `~/.claude/commands/sb/`. When you run `/sb:plan`, Claude Code loads `plan.md` and executes the instructions inside. Workflows in `~/.claude/slopbuster-framework/workflows/` contain the logic. Templates in `~/.claude/slopbuster-framework/templates/` are the file scaffolding.
 
-`bin/install.js` copies `src/` to `~/.claude/` and rewrites `@src/` path references to their installed absolute paths so cross-references between command and workflow files resolve correctly.
+`bin/install.js` copies `src/` to `~/.claude/` and rewrites all `@src/` path references to their installed absolute paths so cross-file references resolve correctly after install.
 
-That's the whole system.
+No service. No daemon. No build step. When SlopBuster isn't running, nothing is running.
 
 ---
 
-## What Success Looks Like
+## Why This Matters
 
-```
-/sb:init           → .slopbuster/ scaffolded in 2 minutes
-/sb:plan           → PLAN.md created, <constraints> visibly empty
-/sb:apply          → ⛔ blocked — Gate hasn't run
-/sb:gate           → 5 questions asked, answers injected verbatim
-/sb:apply          → executes against your constraints, not Claude's assumptions
-/sb:unify          → loop closed, SUMMARY.md written
-/sb:progress       → tells you exactly where you are and what to do next
-```
+The failure mode in AI-assisted development isn't that Claude writes bad code. It's that Claude writes *plausible* code against *implicit* constraints — and you don't discover the mismatch until you're three features deep.
 
-At no point did Claude make an unconstrained architectural decision.
-At no point did slop have room to enter.
+SlopBuster makes the constraints explicit before execution starts. The Gate forces the conversation you should have had anyway. The constraint block makes it impossible to forget. The verification checklist makes "done" mean something specific.
+
+If you're shipping fast and wondering why things keep needing to be redone — you're paying the slop tax.
 
 ---
 

@@ -366,17 +366,59 @@ const toolAccuracyIssues = [
 
 const toolAccuracyScore = Math.round(10 * (1 - toolAccuracyIssues / 11));
 
+// ── 6. Robustness (10 pts) ───────────────────────────────────────────────────
+
+// 6a. resume-project.md does not ask "Ready to continue?" (anti-autonomous pattern)
+const resumeHasAskPattern = resumeContent.includes('Ready to continue?') ||
+  (resumeContent.includes('Ask to proceed') && !resumeContent.includes('Do not ask'));
+if (resumeHasAskPattern) issue('resume-project.md has anti-autonomous "Ask to proceed" pattern — should auto-proceed when signals are set');
+else pass('resume-project.md auto-proceeds without asking');
+
+// 6b. bin/install.js covers @src/references/ path rewriting
+const installerPath = path.join(__dirname, '..', 'bin', 'install.js');
+const installerContent = fs.existsSync(installerPath) ? fs.readFileSync(installerPath, 'utf8') : '';
+// The installer uses regex literals with escaped slashes (/@src\/references\//g),
+// so the raw file text contains '@src\/references' with a backslash.
+const installerCoversReferences = installerContent.includes('@src\\/references') || installerContent.includes('@src/references');
+if (!installerCoversReferences) issue('bin/install.js missing @src/references/ path rewriting — installed commands will have broken reference paths');
+else pass('bin/install.js rewrites @src/references/ paths at install time');
+
+// 6c. All reference files are referenced by at least one workflow or command
+const refFiles = files('references').map(f => `references/${f}`);
+const allWorkflowAndCommandContent = [
+  ...files('workflows').map(f => readSrc(`workflows/${f}`)),
+  ...files('commands').map(f => readSrc(`commands/${f}`)),
+].join('\n');
+let orphanRefs = 0;
+for (const rf of refFiles) {
+  const refName = path.basename(rf);
+  if (!allWorkflowAndCommandContent.includes(refName)) {
+    issue(`Reference file is unreferenced: src/${rf} — wire into a workflow or delete`);
+    orphanRefs++;
+  }
+}
+if (orphanRefs === 0) pass(`All ${refFiles.length} reference files are referenced by a workflow or command`);
+
+const robustnessIssues = [
+  resumeHasAskPattern,
+  !installerCoversReferences,
+  orphanRefs > 0,
+].filter(Boolean).length;
+
+const robustnessScore = Math.round(10 * (1 - robustnessIssues / 3));
+
 // ── Report ──────────────────────────────────────────────────────────────────
 
-const total = refScore + completenessScore + consistencyScore + depthScore + toolAccuracyScore;
+const total = refScore + completenessScore + consistencyScore + depthScore + toolAccuracyScore + robustnessScore;
 
 console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-console.log(`SlopBuster Audit — Score: ${total}/120`);
+console.log(`SlopBuster Audit — Score: ${total}/130`);
 console.log(`  Reference integrity:  ${refScore}/40`);
 console.log(`  Completeness:         ${completenessScore}/35`);
 console.log(`  Consistency:          ${consistencyScore}/25`);
 console.log(`  Content depth:        ${depthScore}/10`);
 console.log(`  Tool accuracy:        ${toolAccuracyScore}/10`);
+console.log(`  Robustness:           ${robustnessScore}/10`);
 console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
 
 if (issues.length) {

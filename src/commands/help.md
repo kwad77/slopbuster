@@ -110,3 +110,14 @@ PLAN ✓ ──▶ GATE ✓       ──▶ APPLY ✓ ──▶ UNIFY ✓    [Co
 PLAN ✓ ──▶ GATE ✓ auto  ──▶ APPLY ◉ ──▶ UNIFY ○    [Auto-cleared — below all thresholds]
 PLAN ✓ ──▶ GATE ✓ off   ──▶ APPLY ◉ ──▶ UNIFY ○    [Gate disabled in config]
 ```
+
+---
+
+## PLAN.md Frontmatter Fields
+
+| Field | Values | Effect |
+|-------|--------|--------|
+| `autonomous` | `true` (default) / `false` | `false` pauses APPLY before each wave and waits for re-run. Use when you want wave-by-wave confirmation. |
+| `depends_on` | `[]` (default) / `["path/to/NN-PP-PLAN.md"]` | APPLY blocks until all listed plans have a SUMMARY.md (UNIFY complete). Use to enforce plan sequencing. |
+| `gate_cleared` | `true` / `false` | Set by `/sb:gate`. APPLY blocks if `false` unless `override` is typed. Do not edit manually. |
+| `files_modified` | `[]` / `["path/to/file"]` | List of files this plan touches. Feeds Gate `file-count` threshold check. |

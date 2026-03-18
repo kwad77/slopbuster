@@ -12,6 +12,10 @@
 
 [Why this project exists, who it is for, and what problem it solves.]
 
+## Stack
+
+[Languages, frameworks, databases, and services this project uses. Be specific — "PostgreSQL 15", not "a database".]
+
 ## Constraints
 
 [Known constraints that apply to all phases — technology choices made, compliance requirements, architectural decisions that are not up for debate.]
