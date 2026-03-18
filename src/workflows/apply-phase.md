@@ -64,6 +64,8 @@ If found:
 
 Parse all `<task>` elements from `<tasks>`. Group by wave attribute.
 
+Read `.slopbuster/config.md`. If `preferences.wave_execution: true` (default), display the wave breakdown:
+
 ```
 Executing: [plan objective, one line]
 
@@ -74,6 +76,8 @@ Wave 1 — independent:
 Wave 2 — depends on wave 1:
   ○ [task 3 name]    [files]
 ```
+
+If `preferences.wave_execution: false`, show a flat task list without wave grouping.
 
 ### 6. Execute tasks by wave
 

@@ -59,7 +59,15 @@ If any ACs are NOT MET: add a note in the SUMMARY, defer the failing criteria to
 Check if this was the last plan in the phase. If so, mark the phase as complete in ROADMAP.md.
 Check if this completes a milestone. If so, note it but do not auto-mark — let the user run `/sb:milestone complete`.
 
-### 7. Update STATE.md
+### 7. Auto-commit (if configured)
+
+Read `.slopbuster/config.md`. If `preferences.auto_commit: true`:
+- Run `git add -A && git commit -m "UNIFY: [NN]-[PP]-PLAN.md — [plan objective one line]"`
+- Show: `✓ Auto-committed (preferences.auto_commit: true)`
+
+If `preferences.auto_commit: false` (default): skip this step silently.
+
+### 8. Update STATE.md
 
 - Update Loop Position: UNIFY ✓
 - Add any deferred items to the Deferred table
@@ -71,7 +79,7 @@ If there is a next plan queued in this phase:
 If the phase is done:
   Next = `/sb:milestone complete [milestone-name]` or `/sb:plan [next-phase-name]`
 
-### 8. Confirm
+### 9. Confirm
 
 ```
 [UNIFY ✓] Loop closed.
