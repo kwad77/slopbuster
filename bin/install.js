@@ -6,35 +6,52 @@ const os = require('os');
 
 const args = process.argv.slice(2);
 
-if (args.includes('--help') || args.includes('-h')) {
-  console.log(`
-SlopBuster installer
+const FLAG = {
+  GLOBAL:     'global',
+  LOCAL:      'local',
+  CONFIG_DIR: 'config-dir',
+  UNINSTALL:  'uninstall',
+  VERBOSE:    'verbose',
+  DRY_RUN:    'dry-run',
+  HELP:       'help',
+};
 
-Usage:
-  npx slopbuster [options]
+function has(flag) { return args.includes('--' + flag); }
+function val(flag) {
+  const i = args.indexOf('--' + flag);
+  return i !== -1 ? args[i + 1] : null;
+}
 
-Options:
-  --global        Install to ~/.claude/ (default)
-  --local         Install to ./.claude/
-  --config-dir    Install to a custom path
-  --uninstall     Remove SlopBuster from the target location
-  --dry-run       Show what would be installed without writing anything
-  --verbose       Show each file as it is installed
-  --help          Show this help
-`);
+if (has(FLAG.HELP) || args.includes('-h')) {
+  console.log([
+    '',
+    'SlopBuster installer',
+    '',
+    'Usage:',
+    '  npx slopbuster [options]',
+    '',
+    'Options:',
+    '  --global        Install to ~/.claude/ (default)',
+    '  --local         Install to ./.claude/',
+    '  --config-dir    Install to a custom path',
+    '  --uninstall     Remove SlopBuster from the target location',
+    '  --dry-run       Show what would be installed without writing anything',
+    '  --verbose       Show each file as it is installed',
+    '  --help          Show this help',
+    '',
+  ].join('\n'));
   process.exit(0);
 }
 
-const flags = {
-  global: args.includes('--global') || (!args.includes('--local') && !args.indexOf('--config-dir') !== -1),
-  local: args.includes('--local'),
-  uninstall: args.includes('--uninstall'),
-  verbose: args.includes('--verbose'),
-  dryRun: args.includes('--dry-run'),
-};
+const configDir = val(FLAG.CONFIG_DIR);
 
-const configDirIdx = args.indexOf('--config-dir');
-const configDir = configDirIdx !== -1 ? args[configDirIdx + 1] : null;
+const flags = {
+  local:     has(FLAG.LOCAL),
+  uninstall: has(FLAG.UNINSTALL),
+  verbose:   has(FLAG.VERBOSE),
+  dryRun:    has(FLAG.DRY_RUN),
+  global:    has(FLAG.GLOBAL) || (!has(FLAG.LOCAL) && !configDir),
+};
 
 // Resolve target prefix
 let targetPrefix;
