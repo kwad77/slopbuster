@@ -8,7 +8,21 @@ Execute a gate-cleared plan.
 
 Read PLAN.md at the path from $ARGUMENTS or STATE.md current plan context.
 
-### 2. Gate clearance check
+### 2. Dependency check
+
+Read `depends_on` from PLAN.md frontmatter.
+
+If `depends_on` is non-empty:
+- For each plan path listed: check whether a corresponding SUMMARY.md exists in the same phase directory
+- If any dependency lacks a SUMMARY.md (UNIFY not complete):
+  ```
+  ⛔ Dependency not satisfied: [plan-path] has not been unified.
+  Complete that plan first: /sb:unify [plan-path]
+  ```
+  Stop.
+- If all dependencies satisfied: continue.
+
+### 3. Gate clearance check
 
 Read `gate_cleared` from PLAN.md frontmatter.
 
@@ -39,7 +53,7 @@ If no override:
 **If `gate_cleared: true`:**
 Verify GATE.md exists at the expected path. If missing, warn but continue.
 
-### 3. Load constraints
+### 4. Load constraints
 
 Read the `<constraints>` section of PLAN.md.
 
@@ -50,7 +64,7 @@ If `<constraints>` is empty (no Gate ran, no override):
 **Internalize the constraints before executing any task.**
 The `<constraints>` section contains the developer's exact words. Execute against them — not your own interpretation of the plan.
 
-### 4. Check for checkpoint resume
+### 5. Check for checkpoint resume
 
 Read STATE.md for `# checkpoint_at: [task-name]`.
 
@@ -59,7 +73,7 @@ If found:
 - During task execution, skip tasks prior to the checkpointed task
 - Start execution from the checkpointed task
 
-### 5. Read and display the execution plan
+### 6. Read and display the execution plan
 
 Parse all `<task>` elements from `<tasks>`. Group by wave attribute.
 
@@ -78,7 +92,7 @@ Wave 2 — depends on wave 1:
 
 If `preferences.wave_execution: false`, show a flat task list without wave grouping.
 
-### 6. Execute tasks by wave
+### 7. Execute tasks by wave
 
 For each wave, execute tasks in the listed order. Within a wave, tasks are logically independent.
 
@@ -113,7 +127,7 @@ Options:
 Write # checkpoint_at: [this-task-name] to STATE.md.
 ```
 
-### 7. Checkpoints
+### 8. Checkpoints
 
 Write `# checkpoint_at: [next-task-name]` to STATE.md before starting:
 - The first task of wave 2 or higher
@@ -122,7 +136,7 @@ Write `# checkpoint_at: [next-task-name]` to STATE.md before starting:
 
 After the task completes and verify passes: remove the `# checkpoint_at:` line from STATE.md.
 
-### 8. Completion check
+### 9. Completion check
 
 After all tasks complete, run every item in `<verification>`:
 
@@ -135,14 +149,14 @@ Final verification:
 
 If any verification item fails: do not declare complete. Report the failure with the exact output. Do not update STATE.md to APPLY ✓ — leave the loop position as APPLY ◉ so the issue is visible on next `/sb:progress`.
 
-### 9. Update STATE.md
+### 10. Update STATE.md
 
 - Clear any remaining `# checkpoint_at:` line
 - Update Loop Position to APPLY ✓
 - Update Last: timestamp + "Apply complete: [NN]-[PP]-PLAN.md"
 - Update Next: `/sb:unify .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-PLAN.md`
 
-### 10. Confirm
+### 11. Confirm
 
 ```
 [APPLY ✓] Plan executed.
