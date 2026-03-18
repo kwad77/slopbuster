@@ -53,7 +53,13 @@ If any tests failed or were blocked:
 Create `.slopbuster/phases/{NN}-{slug}/{NN}-{PP}-UAT-ISSUES.md`
 Use the template at @src/templates/UAT-ISSUES.md
 
-### 5. Report
+### 5. Update STATE.md
+
+Update:
+- Last: timestamp + "Verify complete: [NN]-[PP]-PLAN.md — [N] pass, [N] fail"
+- Next: `/sb:unify [plan-path]` if all pass, or `/sb:fix [PP]` if failures exist
+
+### 6. Report
 
 ```
 UAT Complete

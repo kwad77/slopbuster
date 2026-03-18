@@ -46,7 +46,16 @@ Create the research directory if it doesn't exist: `.slopbuster/research/`
 
 Write: `.slopbuster/research/[topic-slug]-[YYYY-MM-DD].md`
 
-### 5. Confirm
+### 5. Update STATE.md
 
-Show the brief summary and ask:
-"Research saved. Ready to incorporate into `/sb:plan [phase]`?"
+If `.slopbuster/STATE.md` exists:
+- Update Last: timestamp + "Research complete: [topic-slug]"
+- Update Next: `/sb:plan [phase]` (use current phase from STATE.md if known)
+
+### 6. Confirm
+
+Show the brief inline — question, answer, and recommendation only (skip sources unless relevant). Then:
+```
+Research saved: .slopbuster/research/[topic-slug]-[date].md
+Next: /sb:plan [phase]
+```
