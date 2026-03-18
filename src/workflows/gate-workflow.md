@@ -16,6 +16,16 @@ Check `gate_cleared` in the PLAN.md frontmatter. If already `true`:
 
 Read `.slopbuster/config.md` for threshold settings.
 
+If `gate.enabled: false` in config:
+- Set `gate_cleared: true` and `gate_date: [ISO timestamp]` in PLAN.md frontmatter
+- Write `<!-- Gate disabled in config.md — auto-cleared on [ISO date] -->` into `<constraints>`
+- Remove `# gate_pending:` from STATE.md
+- Update STATE.md loop position to GATE ✓ (disabled)
+- Show: `[GATE ✓ disabled] Gate is disabled in config.md. Cleared without interrogation.`
+- Show: `⚠ Re-enable with: /sb:config gate.enabled true`
+- Show next: `/sb:apply [plan-path]`
+- Stop.
+
 ### 2. Trigger analysis
 
 Evaluate the actual PLAN.md content against all thresholds:
