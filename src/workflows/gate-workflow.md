@@ -58,6 +58,8 @@ This should be rare if plan-phase workflow already ran, but handle it:
 Present each question on its own. Wait for the user's complete answer before the next.
 Do not combine questions. Do not summarize mid-interrogation.
 
+Reference: @src/references/gate-questions.md — contains "What to listen for" guidance for each question and the full 8-point checklist context. Use this to probe thin answers with follow-up questions.
+
 ---
 
 **Q1 — Connectivity**
