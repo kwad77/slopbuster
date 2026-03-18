@@ -100,7 +100,18 @@ For each wave, execute tasks in the listed order. Within a wave, tasks are logic
    - If verify passes: show `✓ [task name]` — note which AC this satisfies per `<done>`
    - If verify fails: stop immediately, show the failure output and the exact verify command that failed. Write `# checkpoint_at: [this-task-name]` to STATE.md so APPLY can be re-run after the fix.
 
-**Respect `<boundaries>` at all times.** If a task would require touching a file in DO NOT CHANGE, stop and report it rather than proceeding.
+**Respect `<boundaries>` at all times.** If a task would require touching a file in DO NOT CHANGE, stop immediately and show:
+```
+⛔ Boundary violation: [task name] requires touching [file], which is in DO NOT CHANGE.
+
+The plan must be updated before proceeding.
+Options:
+  1. Remove the file from <boundaries> DO NOT CHANGE if the restriction is no longer valid
+  2. Rewrite the task to avoid touching the protected file
+  3. Run /sb:plan to create a separate plan for changes to that file
+
+Write # checkpoint_at: [this-task-name] to STATE.md.
+```
 
 ### 7. Checkpoints
 
