@@ -74,6 +74,16 @@ If `preferences.auto_commit: false` (default): skip this step silently.
 - Add key decisions to the Decisions table
 - Update Last: timestamp + "Unify complete: [NN]-[PP]-PLAN.md"
 
+**Update progress bars:**
+- Count total plans in the current phase directory (files matching `*-PLAN.md`)
+- Count plans with a corresponding `*-SUMMARY.md` (UNIFY complete)
+- Phase %: `(summaries / total_plans) * 100`, rounded
+- Count total phases in ROADMAP.md
+- Count phases where all plans are unified
+- Milestone %: `(complete_phases / total_phases) * 100`, rounded
+- Render: `[██████░░░░] 60%` — each `█` = 10%, each `░` = remaining
+- Update both Progress lines in STATE.md
+
 If there is a next plan queued in this phase:
   Next = `/sb:plan [phase-name]`
 If the phase is done:
