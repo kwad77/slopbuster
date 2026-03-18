@@ -71,7 +71,15 @@ Write `.slopbuster/phases/{NN}-{slug}/DISCUSS-[YYYY-MM-DD].md` with:
 - Likely Gate triggers
 - Planning inputs
 
-### 8. Close
+### 8. Update STATE.md
+
+Read `.slopbuster/STATE.md`. Update:
+- Last: timestamp + "Discuss complete: [phase]"
+- Next: `/sb:plan [phase]`
+
+If STATE.md does not exist (user ran discuss before init), skip this step.
+
+### 9. Close
 
 ```
 Discussion summary: .slopbuster/phases/{NN}-{slug}/DISCUSS-[date].md
