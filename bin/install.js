@@ -18,6 +18,7 @@ Options:
   --local         Install to ./.claude/
   --config-dir    Install to a custom path
   --uninstall     Remove SlopBuster from the target location
+  --dry-run       Show what would be installed without writing anything
   --verbose       Show each file as it is installed
   --help          Show this help
 `);
@@ -29,6 +30,7 @@ const flags = {
   local: args.includes('--local'),
   uninstall: args.includes('--uninstall'),
   verbose: args.includes('--verbose'),
+  dryRun: args.includes('--dry-run'),
 };
 
 const configDirIdx = args.indexOf('--config-dir');
@@ -82,8 +84,10 @@ function copyWithPathReplacement(srcFile, destFile) {
   content = content.replace(/@src\/templates\//g, `@${fwTarget}/templates/`);
   content = content.replace(/@src\/references\//g, `@${fwTarget}/references/`);
 
-  fs.mkdirSync(path.dirname(destFile), { recursive: true });
-  fs.writeFileSync(destFile, content, 'utf8');
+  if (!flags.dryRun) {
+    fs.mkdirSync(path.dirname(destFile), { recursive: true });
+    fs.writeFileSync(destFile, content, 'utf8');
+  }
 }
 
 function install() {
@@ -92,12 +96,14 @@ function install() {
     process.exit(1);
   }
 
+  if (flags.dryRun) log(`[dry-run] Would install to ${targetPrefix}`);
+
   const counts = { commands: 0, workflows: 0, templates: 0, references: 0 };
 
   // Commands → targetPrefix/commands/sb/
   const commandsSrc = path.join(srcDir, 'commands');
   if (fs.existsSync(commandsSrc)) {
-    fs.mkdirSync(commandsTarget, { recursive: true });
+    if (!flags.dryRun) fs.mkdirSync(commandsTarget, { recursive: true });
     for (const file of fs.readdirSync(commandsSrc)) {
       const src = path.join(commandsSrc, file);
       const dest = path.join(commandsTarget, file);
@@ -112,7 +118,7 @@ function install() {
     const subdirSrc = path.join(srcDir, subdir);
     const subdirDest = path.join(frameworkTarget, subdir);
     if (fs.existsSync(subdirSrc)) {
-      fs.mkdirSync(subdirDest, { recursive: true });
+      if (!flags.dryRun) fs.mkdirSync(subdirDest, { recursive: true });
       for (const file of fs.readdirSync(subdirSrc)) {
         const src = path.join(subdirSrc, file);
         const dest = path.join(subdirDest, file);
@@ -125,12 +131,17 @@ function install() {
 
   const total = counts.commands + counts.workflows + counts.templates + counts.references;
 
-  log(`✓ commands/sb            (${counts.commands} files)`);
-  log(`✓ workflows              (${counts.workflows} files)`);
-  log(`✓ templates              (${counts.templates} files)`);
-  log(`✓ references             (${counts.references} files)`);
-  log(`\nSlopBuster installed — ${total} files → ${targetPrefix}`);
-  log(`\nOpen Claude Code and run /sb:help to get started.`);
+  const prefix = flags.dryRun ? '[dry-run] ' : '';
+  log(`${prefix}✓ commands/sb            (${counts.commands} files)`);
+  log(`${prefix}✓ workflows              (${counts.workflows} files)`);
+  log(`${prefix}✓ templates              (${counts.templates} files)`);
+  log(`${prefix}✓ references             (${counts.references} files)`);
+  if (flags.dryRun) {
+    log(`\n[dry-run] No files written. Remove --dry-run to install.`);
+  } else {
+    log(`\nSlopBuster installed — ${total} files → ${targetPrefix}`);
+    log(`\nOpen Claude Code and run /sb:help to get started.`);
+  }
 }
 
 if (flags.uninstall) {
