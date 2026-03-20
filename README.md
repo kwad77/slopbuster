@@ -77,29 +77,44 @@ VS Code 1.103+ and Cursor 1.5+ support MCP elicitation natively. When the Gate f
 
 ## Install
 
-```bash
-# Auto-detect editors present in your project
-npx slopbuster
+**One command. Done.**
 
-# Specific editors
+```bash
+npx slopbuster
+```
+
+Installs slash commands for your AI editor AND scaffolds `.slopbuster/` in your project. Auto-detects Claude Code, VS Code, and Cursor.
+
+**No Node.js?**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kwad77/slopbuster/master/bin/install.sh | sh
+```
+
+Works on any Mac or Linux with curl. Installs Claude Code support. Re-run with Node once you have it for VS Code/Cursor.
+
+**Specific editors:**
+
+```bash
 npx slopbuster --claude     # Claude Code → ~/.claude/
 npx slopbuster --vscode     # VS Code → .github/prompts/ + .vscode/mcp.json
 npx slopbuster --cursor     # Cursor → .cursor/rules/ + .cursor/mcp.json
 npx slopbuster --all        # All three editors
+```
 
-# Options
+**Other options:**
+
+```bash
 npx slopbuster --dry-run    # Preview what would be installed
 npx slopbuster --verbose    # Show each file as it installs
 npx slopbuster --uninstall  # Remove
 ```
 
-No build step. No compilation. No runtime. SlopBuster is markdown files your editor reads directly. The installer copies them into place and rewrites path references. That's the whole system.
-
-Then open your editor and run:
+No build step. No compilation. No runtime. SlopBuster is markdown files your editor reads directly. After install, `.slopbuster/` is ready in your project — edit `PROJECT.md` with your project name and core value, then start planning.
 
 ```
-/sb:help        (Claude Code)
-/sb-help        (VS Code / Cursor)
+/sb:plan        (Claude Code)
+/sb-plan        (VS Code / Cursor)
 ```
 
 ---

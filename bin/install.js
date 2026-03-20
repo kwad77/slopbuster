@@ -29,26 +29,32 @@ function val(flag) {
 if (has(FLAG.HELP) || args.includes('-h')) {
   console.log([
     '',
-    'SlopBuster installer',
+    'SlopBuster — constraint-first AI development',
     '',
     'Usage:',
     '  npx slopbuster [options]',
+    '',
+    'Installs slash commands for your AI editor AND scaffolds .slopbuster/ in',
+    'the current directory so you can start planning immediately.',
     '',
     'Editor targets (auto-detected if none specified):',
     '  --claude        Install to ~/.claude/  (Claude Code)',
     '  --vscode        Install to .github/prompts/ + .vscode/mcp.json',
     '  --cursor        Install to .cursor/rules/ + .cursor/mcp.json',
-    '  --all           Install for all editors',
+    '  --all           Install for all three editors',
     '',
     'Claude Code options:',
     '  --local         Install to ./.claude/ instead of ~/.claude/',
     '  --config-dir    Install Claude Code files to a custom path',
     '',
     'General:',
-    '  --uninstall     Remove SlopBuster from the target location',
+    '  --uninstall     Remove SlopBuster from the installed location',
     '  --dry-run       Show what would be installed without writing anything',
-    '  --verbose       Show each file as it is installed',
+    '  --verbose       Show each file as it installs',
     '  --help          Show this help',
+    '',
+    'No Node.js? Use the shell installer:',
+    '  curl -fsSL https://raw.githubusercontent.com/kwad77/slopbuster/master/bin/install.sh | sh',
     '',
   ].join('\n'));
   process.exit(0);
@@ -367,13 +373,151 @@ function installCursor() {
   return count;
 }
 
+// ─── Scaffold .slopbuster/ ────────────────────────────────────────────────────
+
+function scaffoldProject() {
+  const cwd = process.cwd();
+  const sbDir = path.join(cwd, '.slopbuster');
+
+  if (fs.existsSync(sbDir)) {
+    log('  .slopbuster/ already exists — keeping your existing project (run /sb:init to reinitialize)');
+    return;
+  }
+
+  // Detect project name and stack from package.json if available
+  let projectName = path.basename(cwd);
+  let projectStack = '(fill in: languages, frameworks, databases, services)';
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
+    if (pkg.name) projectName = pkg.name;
+    const deps = Object.keys({ ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) });
+    if (deps.length > 0) projectStack = deps.slice(0, 8).join(', ');
+  } catch { /* no package.json — use defaults */ }
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const dirs = [
+    sbDir,
+    path.join(sbDir, 'phases'),
+    path.join(sbDir, 'stewards'),
+    path.join(sbDir, 'records'),
+  ];
+
+  if (!flags.dryRun) {
+    for (const dir of dirs) fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const projectMd = [
+    `# ${projectName}`,
+    '',
+    '**Core value:** (edit this — what must this project do above all else? If everything else fails but this works, you shipped.)',
+    '',
+    '**Description:** (one sentence — what is this project and who does it serve?)',
+    '',
+    `**Initialized:** ${today}`,
+    '',
+    '---',
+    '',
+    '## Context',
+    '',
+    '(Why this project exists, who it is for, and what problem it solves.)',
+    '',
+    '## Stack',
+    '',
+    projectStack,
+    '',
+    '## Constraints',
+    '',
+    '(Known constraints — technology choices already made, compliance requirements, architectural decisions not up for debate.)',
+    '',
+    '## Out of Scope',
+    '',
+    '(What this project explicitly does not do. Being clear here prevents scope creep.)',
+    '',
+  ].join('\n');
+
+  // STATE.md — clean template with today's date filled in
+  let stateMd = fs.readFileSync(path.join(srcDir, 'templates', 'STATE.md'), 'utf8');
+  stateMd = stateMd
+    .replace('[YYYY-MM-DD HH:MM] — [what happened]', `${today} — Initialized`)
+    .replace('# gate_pending: [plan-path]', '')
+    .replace('# checkpoint_at: [task-name]', '')
+    .replace('[exact command with path]', '/sb:plan');
+
+  // ROADMAP.md — project name and date filled in
+  let roadmapMd = fs.readFileSync(path.join(srcDir, 'templates', 'ROADMAP.md'), 'utf8');
+  roadmapMd = roadmapMd
+    .replace('[Project Name]', projectName)
+    .replace('[YYYY-MM-DD]', today);
+
+  const configMd = fs.readFileSync(path.join(srcDir, 'templates', 'config.md'), 'utf8');
+
+  const stewardsReadme = [
+    '# Domain Stewardship',
+    '',
+    'Domain teams drop files here. Each file injects Gate questions automatically when a plan touches that domain.',
+    '',
+    '## Quick start',
+    '',
+    '1. Create a steward file for your domain (e.g. `database.md`, `auth.md`, `payments.md`)',
+    '2. Set `stewards.enabled: true` in `.slopbuster/config.md`',
+    '3. The Gate auto-imports matching steward files on every plan',
+    '',
+    '## File format',
+    '',
+    '```yaml',
+    '---',
+    'owner: "DBA Team <dba@company.com>"',
+    'triggers: [database]',
+    'file_paths: ["**/migrations/**", "**/models/**"]',
+    '---',
+    '',
+    '## Additional Gate Questions',
+    '',
+    '### Q-Database-1: Index strategy',
+    'What indexes does this change require? Have they been reviewed for production data volume?',
+    '',
+    '## Required Checklist Items',
+    '',
+    '- [ ] Migration tested in staging with production data volume',
+    '- [ ] Rollback migration written and tested',
+    '',
+    '## Approved Patterns',
+    '',
+    '- Using the standard migration framework (no raw SQL DDL)',
+    '',
+    '## Anti-Patterns',
+    '',
+    '- Dropping columns without a deprecation period',
+    '```',
+    '',
+    'Domains to cover: database · auth · payments · network · infrastructure · data-privacy',
+    '',
+  ].join('\n');
+
+  if (!flags.dryRun) {
+    fs.writeFileSync(path.join(sbDir, 'PROJECT.md'), projectMd);
+    fs.writeFileSync(path.join(sbDir, 'STATE.md'), stateMd);
+    fs.writeFileSync(path.join(sbDir, 'ROADMAP.md'), roadmapMd);
+    fs.writeFileSync(path.join(sbDir, 'config.md'), configMd);
+    fs.writeFileSync(path.join(sbDir, 'stewards', 'README.md'), stewardsReadme);
+  }
+
+  const prefix = flags.dryRun ? '[dry-run] ' : '';
+  log(`${prefix}✓ .slopbuster/ scaffolded — PROJECT.md · STATE.md · ROADMAP.md · config.md`);
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 if (flags.uninstall) {
   uninstall();
 } else {
   if (!fs.existsSync(srcDir)) {
-    console.error('Error: src/ directory not found. Is this a valid SlopBuster installation?');
+    console.error('');
+    console.error('  Error: src/ directory not found.');
+    console.error('  This usually means the package was not installed correctly.');
+    console.error('  Try: npx slopbuster@latest');
+    console.error('');
     process.exit(1);
   }
 
@@ -384,21 +528,41 @@ if (flags.uninstall) {
   if (targetEditors.includes('vscode')) total += installVSCode();
   if (targetEditors.includes('cursor')) total += installCursor();
 
+  // Auto-scaffold .slopbuster/ in current project directory
+  if (!flags.dryRun || flags.verbose) {
+    log('');
+    scaffoldProject();
+  }
+
   if (!flags.dryRun) {
     log('');
-    log('Quick start:');
+    log('─────────────────────────────────────────');
+    log('');
+
+    if (fs.existsSync(path.join(process.cwd(), '.slopbuster'))) {
+      log('Next: edit .slopbuster/PROJECT.md → set your project name and core value');
+      log('');
+    }
+
     if (targetEditors.includes('claude')) {
-      log('  Claude Code:  /sb:init  then  /sb:plan');
+      log('  Claude Code   →  /sb:plan   (start your first plan)');
     }
     if (targetEditors.includes('vscode')) {
-      log('  VS Code:      /sb-init  then  /sb-plan  (Copilot Chat)');
+      log('  VS Code       →  /sb-plan   (Copilot Chat — agent mode)');
     }
     if (targetEditors.includes('cursor')) {
-      log('  Cursor:       /sb-init  then  /sb-plan  (Cursor Chat)');
+      log('  Cursor        →  /sb-plan   (Cursor Chat)');
     }
+
     log('');
-    log('  MCP Gate enforcement (VS Code 1.103+, Cursor 1.5+):');
-    log('  Connect the slopbuster MCP server — Gate opens a native form dialog.');
+    log('  /sb:help for the full command reference');
+    log('');
+
+    if (targetEditors.includes('vscode') || targetEditors.includes('cursor')) {
+      log('  MCP Gate: connect the slopbuster server in your editor');
+      log('  VS Code 1.103+ / Cursor 1.5+ → Gate opens a native form dialog');
+      log('');
+    }
   } else {
     log(`\n[dry-run] ${total} files would be installed. Remove --dry-run to install.`);
   }
