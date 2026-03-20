@@ -6,6 +6,32 @@
 
 ---
 
+## Risk Classification
+
+**Tier:** LOW
+**Domains detected:** none
+**Triggers fired:** none
+
+---
+
+## Attribution
+
+**Cleared by:** local
+**Model:** [AI model]
+**Plan hash:** [sha256 of plan content at gate time]
+**Timestamp:** [ISO timestamp]
+**Steward files active:** none
+
+---
+
+## Domain Context
+
+<!-- Stewardship import slot — populated in Goal 3 when .slopbuster/stewards/ files match detected domains -->
+<!-- When stewards.enabled: true, matching steward files inject additional questions and checklist items here -->
+stewards: disabled
+
+---
+
 ## Trigger Analysis
 
 Thresholds that fired:

@@ -12,6 +12,11 @@ gate:
 enterprise_audit:
   enabled: false
 
+stewards:
+  enabled: false            # Set true to activate domain stewardship import at Gate time
+  directory: .slopbuster/stewards/
+  auto_import: true         # Auto-detect domain matches from trigger signals and file paths
+
 preferences:
   auto_commit: false
   wave_execution: true      # Show wave grouping hints during APPLY

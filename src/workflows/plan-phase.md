@@ -79,6 +79,36 @@ Fill in:
 - `<verification>`: final checklist before declaring complete
 - `<success_criteria>`: measurable final-state assertions
 
+### 5b. Domain and risk classification
+
+After trigger evaluation, classify the plan:
+
+**Domain detection** — map triggers and file paths to domains:
+
+| Signal | Domain |
+|--------|--------|
+| `database-schema` trigger | `database` |
+| `auth-session` trigger | `auth` |
+| `api-contract` trigger | `api` |
+| File paths matching `**/payment*`, `**/billing*`, `**/checkout*` | `payments` |
+| File paths matching `**/network*`, `**/vpc*`, `**/firewall*`, `**/dns*` | `network` |
+| File paths matching `**/infra*`, `**/deploy*`, `**/ci*`, `**/.github/workflows*` | `infrastructure` |
+| File paths matching `**/pii*`, `**/gdpr*`, `**/privacy*`, `**/consent*` | `data-privacy` |
+
+Set `domain: [list]` in PLAN.md frontmatter. Empty list is valid.
+
+**Risk tier** — based on trigger count and domain combination:
+
+| Condition | Tier |
+|-----------|------|
+| No triggers fired | LOW |
+| 1–2 triggers | MEDIUM |
+| 3+ triggers | HIGH |
+| `auth` domain + (`database` or `api` domain) | CRITICAL |
+| `payments` domain + any other trigger | CRITICAL |
+
+Set `risk_tier: [tier]` in PLAN.md frontmatter. Show the tier visibly in the plan confirmation.
+
 ### 6. Gate determination
 
 **If no thresholds fired (simple plan):**

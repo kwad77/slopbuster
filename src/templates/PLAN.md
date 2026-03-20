@@ -9,6 +9,9 @@ autonomous: true
 gate_cleared: false
 gate_date: null
 gate_triggered_by: ""
+risk_tier: LOW
+domain: []
+steward_files: []
 ---
 
 <constraints>

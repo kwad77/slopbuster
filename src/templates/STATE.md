@@ -28,6 +28,12 @@ PLAN ──▶ GATE ──▶ APPLY ──▶ UNIFY
 | Issue | Phase | Effort | Revisit |
 |-------|-------|--------|---------|
 
+## Active Stewards
+
+<!-- Populated when stewards.enabled: true and domain matches exist -->
+<!-- Format: domain: steward-file.md (owner) -->
+none
+
 ## Session Continuity
 
 Stopped: [description of last action]

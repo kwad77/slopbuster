@@ -407,18 +407,94 @@ const robustnessIssues = [
 
 const robustnessScore = Math.round(10 * (1 - robustnessIssues / 3));
 
+// ── 7. Enterprise Scaffolding (20 pts) ──────────────────────────────────────
+// Verifies that stewardship, risk classification, and attribution stubs
+// are present in the right places — ready for Goal 1-3 implementation.
+
+const planTmpl  = srcExists('templates/PLAN.md')  ? readSrc('templates/PLAN.md')  : '';
+const gateTmpl  = srcExists('templates/GATE.md')  ? readSrc('templates/GATE.md')  : '';
+const configTmpl = srcExists('templates/config.md') ? readSrc('templates/config.md') : '';
+const gateWf    = srcExists('workflows/gate-workflow.md') ? readSrc('workflows/gate-workflow.md') : '';
+const planWf    = srcExists('workflows/plan-phase.md')    ? readSrc('workflows/plan-phase.md')    : '';
+const initWf    = srcExists('workflows/init-project.md')  ? readSrc('workflows/init-project.md')  : '';
+
+// 7a. PLAN.md template has risk_tier field
+const planHasRiskTier = planTmpl.includes('risk_tier');
+if (!planHasRiskTier) issue('PLAN.md template missing risk_tier frontmatter field');
+else pass('PLAN.md template has risk_tier field');
+
+// 7b. PLAN.md template has domain field
+const planHasDomain = planTmpl.includes('domain:');
+if (!planHasDomain) issue('PLAN.md template missing domain: frontmatter field');
+else pass('PLAN.md template has domain: field');
+
+// 7c. PLAN.md template has steward_files field
+const planHasStewardFiles = planTmpl.includes('steward_files');
+if (!planHasStewardFiles) issue('PLAN.md template missing steward_files frontmatter field');
+else pass('PLAN.md template has steward_files: field');
+
+// 7d. GATE.md template has Attribution section
+const gateHasAttribution = gateTmpl.includes('## Attribution');
+if (!gateHasAttribution) issue('GATE.md template missing ## Attribution section');
+else pass('GATE.md template has Attribution section');
+
+// 7e. GATE.md template has Risk Classification section
+const gateHasRiskClass = gateTmpl.includes('## Risk Classification');
+if (!gateHasRiskClass) issue('GATE.md template missing ## Risk Classification section');
+else pass('GATE.md template has Risk Classification section');
+
+// 7f. GATE.md template has Domain Context / stewardship slot
+const gateHasDomainContext = gateTmpl.includes('Domain Context') || gateTmpl.includes('stewardship');
+if (!gateHasDomainContext) issue('GATE.md template missing Domain Context / stewardship slot');
+else pass('GATE.md template has Domain Context (stewardship slot)');
+
+// 7g. config.md template has stewards: block
+const configHasStewards = configTmpl.includes('stewards:');
+if (!configHasStewards) issue('config.md template missing stewards: block');
+else pass('config.md template has stewards: block');
+
+// 7h. gate-workflow.md has stewardship import step
+const gateWfHasStewardImport = gateWf.includes('Stewardship import') || gateWf.includes('stewards.enabled');
+if (!gateWfHasStewardImport) issue('gate-workflow.md missing stewardship import step');
+else pass('gate-workflow.md has stewardship import step');
+
+// 7i. gate-workflow.md writes risk_tier to PLAN.md frontmatter
+const gateWfWritesRiskTier = gateWf.includes('risk_tier');
+if (!gateWfWritesRiskTier) issue('gate-workflow.md does not write risk_tier to PLAN.md frontmatter');
+else pass('gate-workflow.md writes risk_tier to PLAN.md');
+
+// 7j. plan-phase.md has domain detection logic
+const planWfHasDomainDetect = planWf.includes('domain') && planWf.includes('Domain detection');
+if (!planWfHasDomainDetect) issue('plan-phase.md missing domain detection logic');
+else pass('plan-phase.md has domain detection logic');
+
+// 7k. init-project.md creates .slopbuster/stewards/ directory
+const initCreatesStewards = initWf.includes('stewards');
+if (!initCreatesStewards) issue('init-project.md does not create .slopbuster/stewards/ directory');
+else pass('init-project.md creates .slopbuster/stewards/ directory');
+
+const enterpriseChecks = [
+  planHasRiskTier, planHasDomain, planHasStewardFiles,
+  gateHasAttribution, gateHasRiskClass, gateHasDomainContext,
+  configHasStewards, gateWfHasStewardImport, gateWfWritesRiskTier,
+  planWfHasDomainDetect, initCreatesStewards,
+];
+const enterprisePassing = enterpriseChecks.filter(Boolean).length;
+const enterpriseScore = Math.round(20 * (enterprisePassing / enterpriseChecks.length));
+
 // ── Report ──────────────────────────────────────────────────────────────────
 
-const total = refScore + completenessScore + consistencyScore + depthScore + toolAccuracyScore + robustnessScore;
+const total = refScore + completenessScore + consistencyScore + depthScore + toolAccuracyScore + robustnessScore + enterpriseScore;
 
 console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-console.log(`SlopBuster Audit — Score: ${total}/130`);
+console.log(`SlopBuster Audit — Score: ${total}/150`);
 console.log(`  Reference integrity:  ${refScore}/40`);
 console.log(`  Completeness:         ${completenessScore}/35`);
 console.log(`  Consistency:          ${consistencyScore}/25`);
 console.log(`  Content depth:        ${depthScore}/10`);
 console.log(`  Tool accuracy:        ${toolAccuracyScore}/10`);
 console.log(`  Robustness:           ${robustnessScore}/10`);
+console.log(`  Enterprise scaffold:  ${enterpriseScore}/20`);
 console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
 
 if (issues.length) {

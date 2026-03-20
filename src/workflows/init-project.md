@@ -41,6 +41,7 @@ Show the defaults briefly. Most users will say no.
 Create:
 - `.slopbuster/`
 - `.slopbuster/phases/`
+- `.slopbuster/stewards/`
 
 ### 4. Write PROJECT.md
 
@@ -69,6 +70,67 @@ Set initial state:
 Use the template at @src/templates/config.md
 
 Apply any threshold changes the user requested. Leave defaults for everything else.
+
+### 7b. Write stewards README
+
+Create `.slopbuster/stewards/README.md`:
+
+```markdown
+# Domain Stewardship
+
+Domain teams place stewardship files here. Each file injects additional Gate
+questions and checklist items when a plan touches that team's domain.
+
+## How it works
+
+1. Create a stewardship file for your domain (e.g., `network.md`, `database.md`)
+2. Set `stewards.enabled: true` in `.slopbuster/config.md`
+3. When a plan triggers your domain, the Gate automatically includes your
+   questions after the five core questions
+
+## Stewardship file format
+
+```markdown
+# [Domain] Stewardship
+
+**Owner:** [Team name and contact]
+**Triggers:** [Which Gate signals activate this file — e.g., database-schema, auth-session]
+**File paths:** [Glob patterns that activate this file — e.g., src/payments/**)
+
+## Additional Gate Questions
+
+### Q-[Domain]-1: [Question title]
+[Full question text]
+
+### Q-[Domain]-2: [Question title]
+[Full question text]
+
+## Required Checklist Items
+
+- [ ] [Item specific to this domain]
+- [ ] [Item specific to this domain]
+
+## Approved Patterns
+
+[Patterns pre-cleared by this team — plans matching these patterns skip the
+domain checklist items above]
+
+## Anti-Patterns
+
+[Known bad approaches this team has seen — presented as warnings during Gate]
+```
+
+## Domains to consider
+
+| Domain | Typical owner | Triggers on |
+|--------|--------------|-------------|
+| `network.md` | Network/Infra team | Plans touching network config, VPCs, DNS, firewall |
+| `database.md` | DBA team | database-schema trigger |
+| `payments.md` | Payments team | Plans touching payment processing, billing |
+| `auth.md` | Security team | auth-session trigger |
+| `infrastructure.md` | Platform/SRE | Plans touching deployment, CI/CD, infrastructure |
+| `data-privacy.md` | Compliance team | Plans touching PII, data retention, consent |
+```
 
 ### 8. Create phase directories
 
