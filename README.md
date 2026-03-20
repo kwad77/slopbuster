@@ -224,51 +224,44 @@ If you're shipping fast and wondering why things keep needing to be redone — y
 
 ---
 
-## Enterprise Direction
+## Enterprise Roadmap
 
-SlopBuster's GATE mechanism is structurally aligned with what every major AI governance framework requires: risk assessment before action, human oversight proportional to risk tier, and decision documentation. No other AI coding tool does this. Most are suggestion engines or post-generation scanners. SlopBuster enforces constraints before a single line of code is written.
+Every major AI governance framework — NIST AI RMF, ISO 42001, EU AI Act — mandates the same thing: risk assessment before action, human oversight proportional to risk, and a documented decision trail. Current AI coding tools operate after architectural decisions are made. SlopBuster operates before. That distinction is the only place where governance is actually enforceable.
 
-The roadmap is built in four phases. Each phase lays groundwork for the next.
+### Goal 1 — Auditable by Default
 
-### Phase 1 — Compliance Foundation
+AI-assisted code changes should produce compliance evidence automatically, not require manual documentation after the fact.
 
-- **Compliance evidence pack** — GATE artifacts reformatted as compliance evidence. JSON event stream for SIEM ingest (Splunk, Sentinel, QRadar). One-command export for SOC 2 control evidence, HIPAA audit records, FedRAMP events.
-- **Dual attribution chain** — every Gate-cleared change signed with AI model identity + authenticated human + plan hash + timestamp. Non-repudiable. Solves the SOX/HIPAA question: "who is accountable when AI-generated code causes an incident?"
-- **Stewardship scaffolding** — `.slopbuster/stewards/` directory established. Data structures in GATE.md, STATE.md, and PLAN.md include stewardship slots from day one, even before stewardship is active.
+Every Gate clearance becomes a structured audit record — signed with AI model identity, authenticated human identity, plan hash, and timestamp. That record exports directly to SIEM systems (Splunk, Sentinel, QRadar), maps to SOC 2 controls, HIPAA audit requirements, or FedRAMP event standards depending on your compliance posture. The question "who is accountable when AI-generated code causes an incident?" has a non-repudiable answer baked into the development workflow, not reconstructed from git blame after the fact.
 
-### Phase 2 — Identity and Risk Routing
+### Goal 2 — Risk-Aware, Not Risk-Ignorant
 
-- **Identity-aware Gate** — SSO/SAML integration. User identity attached to every Gate decision. Role-based Gate authority: junior engineers clear LOW-risk plans; architects and leads clear HIGH.
-- **Risk classification** — every plan auto-classified as LOW / MEDIUM / HIGH / CRITICAL based on trigger count, file domains (auth, payments, PII), and dependency type. HIGH/CRITICAL plans route to mandatory ARB approval before Gate proceeds.
-- **ARB and change management integration** — Jira ticket auto-created for Gate-triggered plans. ServiceNow change request generated with risk tier pre-populated. GitHub/GitLab PRs annotated with Gate clearance status and link to GATE.md.
+Not every change carries the same risk. The tools should know the difference.
 
-### Phase 3 — Expert Stewardship
+Plans are classified automatically — LOW, MEDIUM, HIGH, CRITICAL — based on what they touch: authentication systems, payment processing, PII handling, external contracts. That classification routes the change accordingly. A junior engineer on a LOW-risk refactor proceeds without friction. A HIGH-risk schema migration routes to an Architecture Review Board before the Gate even opens. Role-based Gate authority maps to your org hierarchy, not to self-selection. SSO and SCIM keep identity authoritative. Jira and ServiceNow receive structured change requests with risk tier pre-populated, eliminating the manual translation layer between development and change management.
 
-The concept: domain teams own markdown files that automatically inject into the Gate when their domain is touched. The network team owns `network.md`. The DBA team owns `database.md`. The payments team owns `payments.md`. When a plan triggers a relevant domain, the stewardship file's additional questions and checklist items are added to that Gate interrogation — after the five core questions.
+### Goal 3 — Institutional Knowledge That Doesn't Walk Out the Door
+
+The biggest governance failure in most organizations isn't that the rules don't exist — it's that the rules live in people's heads, not in systems.
+
+Expert stewardship addresses this directly. Domain teams own versioned markdown files that inject into the Gate whenever their domain is touched:
 
 ```
 .slopbuster/stewards/
-├── network.md        ← Network team — asks about BGP failover, CIDR conflicts
-├── database.md       ← DBA team — asks about index strategy, migration reversibility
-├── payments.md       ← Payments team — PCI-DSS checklist items, fraud surface
-├── auth.md           ← Security team — threat model questions, token lifecycle
-└── infrastructure.md ← Platform/SRE — deployment blast radius, rollback runbooks
+├── network.md        ← Network team — BGP failover, CIDR conflicts, firewall surface
+├── database.md       ← DBA team — index strategy, migration reversibility, replication lag
+├── payments.md       ← Payments team — PCI-DSS checklist, fraud surface, settlement windows
+├── auth.md           ← Security team — threat model questions, token lifecycle, session boundaries
+└── infrastructure.md ← Platform/SRE — deployment blast radius, rollback runbooks, on-call scope
 ```
 
-Stewardship files are version-controlled. Changes require review. When a post-incident review reveals "we should have asked about X" — the relevant team adds it to their file. Every future plan touching their domain inherits that institutional knowledge automatically.
+When a plan touches the payments domain, the payments team's questions and checklist items are added to that Gate interrogation — automatically, every time, without anyone remembering to ask. When a post-incident review reveals a question that should have been asked, the relevant team adds it to their file. Every future plan touching their domain inherits that lesson. The stewardship files are version-controlled. Changes require review. The institutional knowledge is in the system, not in the senior engineer who just gave notice.
 
-This is distributed governance at scale. No central team has to know everything. Each team encodes their expertise once. The Gate asks it forever.
+### Goal 4 — Governance as Infrastructure
 
-### Phase 4 — Governance Platform
+Compliance shouldn't be a separate workstream that runs alongside engineering. It should be a property of the engineering workflow itself.
 
-- **Governance framework modes** — config flag for NIST AI RMF, ISO 42001, EU AI Act, HIPAA, FedRAMP. Each mode produces evidence formatted to that framework's audit requirements.
-- **Provenance Bill of Materials** — every Gate-cleared plan generates a signed PBOM attached to the Git commit: model identity, plan hash, Gate Q&A hash, stewardship file versions, timestamp, risk classification.
-- **Compliance dashboard** — Gate clearance rates, override frequency, risk tier distribution, constraint quality scores, team-by-team governance posture. The QBR slide for your CISO.
-- **On-premises / air-gapped package** — Docker container, zero cloud dependency. Required for government, defense, and classified environments.
-
----
-
-The positioning is deliberate. Current AI coding tools are suggestion engines or post-generation scanners — they operate after architectural decisions are already made. SlopBuster operates before. The constraint block is filled before execution starts. That's the only place where governance is actually enforceable.
+Governance framework modes (NIST AI RMF, ISO 42001, EU AI Act, HIPAA, FedRAMP) produce audit evidence formatted to each framework's requirements — not generic exports that someone has to manually map. A Provenance Bill of Materials attaches to every Gate-cleared commit: model identity, plan hash, constraint fingerprint, stewardship file versions, risk classification. A compliance dashboard surfaces Gate clearance rates, override frequency, constraint quality trends, and team-by-team governance posture — the view a CISO or engineering director needs without building it themselves. On-premises and air-gapped deployment packages extend this to regulated industries where cloud dependency is not an option.
 
 ---
 
