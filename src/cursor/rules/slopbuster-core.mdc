@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+---
+
+# SlopBuster — Constraint-First Development
+
+SlopBuster enforces the constraint-first loop: **PLAN → GATE → APPLY → UNIFY**.
+Every unit of work completes the loop. The Gate is not optional.
+
+## Core Rules
+
+- Before any SlopBuster work, read `.slopbuster/STATE.md` for the current loop position.
+- **Never start APPLY** without `gate_cleared: true` in the PLAN.md frontmatter.
+- If `# gate_pending:` exists in STATE.md, the Gate must run before anything else.
+- Developer Gate answers are **never summarized or rephrased** — copy verbatim into `<constraints>`.
+- `.slopbuster/STATE.md` is ground truth for loop position. When STATE.md conflicts with disk state, trust the disk.
+
+## Loop States
+
+```
+PLAN ◉ ──▶ GATE ○  ──▶ APPLY ○ ──▶ UNIFY ○    Planning
+PLAN ✓ ──▶ GATE ⚠  ──▶ APPLY ○ ──▶ UNIFY ○    Gate pending — APPLY blocked
+PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ◉ ──▶ UNIFY ○    Executing
+PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ✓ ──▶ UNIFY ◉    Reconciling
+PLAN ✓ ──▶ GATE ✓  ──▶ APPLY ✓ ──▶ UNIFY ✓    Complete
+```
+
+## MCP Tools (if SlopBuster MCP server is connected)
+
+- `slopbuster_gate` — enforces the Gate with a native elicitation form (5 questions)
+- `slopbuster_status` — reads current loop state from STATE.md
+
+## Override
+
+If the developer types `override` when APPLY is blocked: proceed, log the bypass to STATE.md Decisions table with timestamp. This is a permanent record.
+
+## Project Structure
+
+```
+.slopbuster/
+├── STATE.md                     — loop position, decisions log
+├── PROJECT.md                   — core value, stack, team
+├── config.md                    — gate thresholds, feature flags
+└── phases/
+    └── {NN}-{slug}/
+        ├── {NN}-{PP}-PLAN.md    — constraint-first plan
+        ├── {NN}-{PP}-GATE.md    — gate clearance artifact
+        └── {NN}-{PP}-SUMMARY.md — completion record
+```

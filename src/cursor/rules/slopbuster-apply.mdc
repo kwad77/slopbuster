@@ -1,0 +1,36 @@
+---
+globs: [".slopbuster/**/PLAN.md", ".slopbuster/STATE.md", ".slopbuster/**/GATE.md"]
+---
+
+# SlopBuster APPLY Context
+
+When a PLAN.md or STATE.md file is in context, you are operating inside a SlopBuster loop.
+
+## Before executing any task
+
+1. Check `gate_cleared: true` in PLAN.md frontmatter. If missing or false: APPLY is blocked.
+   - Show the block message and tell the user to run `/sb-gate`.
+   - Exception: if the user types `override`, log to STATE.md Decisions and proceed.
+
+2. Read `<constraints>` first — these are the developer's exact Gate answers. They are the execution contract. Constraints override everything else in the plan.
+
+3. Check `depends_on` in PLAN.md frontmatter. All listed plans must have a SUMMARY.md (UNIFY complete) before this plan can execute.
+
+## Task execution
+
+- Work wave by wave. Wave 1 tasks are independent. Wave 2+ tasks depend on prior waves.
+- After completing each task: update STATE.md with `# checkpoint_at: [task-name]`.
+- Each task must have a `<verify>` step — run it before marking the task complete.
+- If a verify step fails: stop, report, do not continue to the next task.
+
+## Checkpoint resume
+
+If STATE.md has `# checkpoint_at: [task-name]`, resume from that task. Do not re-run completed tasks.
+
+## Override logging format
+
+```
+| [ISO timestamp] | Gate bypass (override) | [phase]-[plan] | Skipped Gate — no constraints injected |
+```
+
+Add to the Decisions table in STATE.md.

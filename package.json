@@ -1,15 +1,16 @@
 {
   "name": "slopbuster",
-  "version": "0.2.0",
-  "description": "Constraint-first AI-assisted development for Claude Code",
+  "version": "0.3.0",
+  "description": "Constraint-first AI-assisted development for Claude Code, VS Code, and Cursor",
   "bin": {
-    "slopbuster": "bin/install.js"
+    "slopbuster": "bin/install.js",
+    "slopbuster-mcp": "bin/mcp-server.js"
   },
   "files": [
     "bin/",
     "src/"
   ],
-  "keywords": ["claude", "claude-code", "ai", "development", "constraints", "framework", "gate", "plan"],
+  "keywords": ["claude", "claude-code", "cursor", "vscode", "copilot", "ai", "development", "constraints", "framework", "gate", "plan", "mcp"],
   "license": "MIT",
   "engines": {
     "node": ">=18"

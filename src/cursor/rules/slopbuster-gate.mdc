@@ -1,0 +1,97 @@
+---
+description: SlopBuster Gate circuit breaker — use when running /sb-gate or when gate_pending is set in STATE.md
+---
+
+# Gate Workflow — Circuit Breaker
+
+## Step 1 — Load the plan
+
+Read the PLAN.md path from `# gate_pending:` in `.slopbuster/STATE.md`, or use the user-supplied path.
+
+Check `gate_cleared` in PLAN.md frontmatter. If already `true`: report gate already cleared, show next step (`/sb-apply`), stop.
+
+## Step 2 — Check thresholds
+
+Fire Gate if **any** of these are true:
+
+| Threshold | Signal |
+|-----------|--------|
+| > 5 distinct files in `<files>` tags | `file-count` |
+| New external dependencies (npm, pip, cargo, go get) | `new-dependencies` |
+| Database schema / migration / ORM changes | `database-schema` |
+| API contract, endpoint, or shared utility changes | `api-contract` |
+| Auth, session, JWT, permissions, roles | `auth-session` |
+
+If no thresholds fire: auto-clear (write `<!-- Gate auto-cleared: no thresholds met -->` to `<constraints>`, set `gate_cleared: true`, update STATE.md, show `[GATE ✓ auto]`).
+
+## Step 3 — Gate enforcement
+
+**If the `slopbuster_gate` MCP tool is available:** call it. The tool opens a native elicitation form, collects the 5 answers, and writes them verbatim to PLAN.md. You do not need to ask the questions.
+
+**If MCP is not available:** ask each question in sequence. Wait for a complete answer before moving to the next. Do not combine questions.
+
+### The 5 Questions
+
+**Q1 — Connectivity**
+What systems does this plan connect to or affect? List all downstream dependencies, webhooks, and clients. What is the blast radius if this rolls back?
+
+**Q2 — Performance**
+What are the latency targets? Where are the DB queries and do they use indexes? What is the memory profile under load?
+
+**Q3 — Concurrency**
+Are write operations idempotent? What are the race conditions? What is the locking and tie-break strategy?
+
+**Q4 — Security**
+Which endpoints are protected vs. public? What inputs are validated? What must never be logged? How are secrets managed?
+
+**Q5 — Rollback**
+If this plan fails mid-execution, how do you recover? Is the migration reversible? Can services restart safely? What is the manual recovery path?
+
+## Step 4 — Inject constraints verbatim
+
+Write the developer's exact answers into `<constraints>` in PLAN.md:
+
+```xml
+<constraints>
+## Q1 — Connectivity
+[exact developer words — no changes]
+
+## Q2 — Performance
+[exact developer words]
+
+## Q3 — Concurrency
+[exact developer words]
+
+## Q4 — Security
+[exact developer words]
+
+## Q5 — Rollback
+[exact developer words]
+</constraints>
+```
+
+**Never summarize. Never rephrase. Copy verbatim.**
+
+## Step 5 — Update frontmatter and STATE.md
+
+Set in PLAN.md frontmatter:
+- `gate_cleared: true`
+- `gate_date: [ISO timestamp]`
+- `gate_triggered_by: "[triggers that fired]"`
+
+In STATE.md:
+- Remove `# gate_pending:` line
+- Update loop position to `GATE ✓`
+
+## Step 6 — Confirm
+
+```
+[GATE ✓] Circuit breaker cleared.
+
+Triggers:    [list]
+Constraints: 5 answers injected verbatim
+
+PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○
+
+Next: /sb-apply
+```
