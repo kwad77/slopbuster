@@ -80,7 +80,7 @@ VS Code 1.103+ and Cursor 1.5+ support MCP elicitation natively. When the Gate f
 **One command. Done.**
 
 ```bash
-npx slopbuster
+npx github:kwad77/slopbuster
 ```
 
 Installs slash commands for your AI editor AND scaffolds `.slopbuster/` in your project. Auto-detects Claude Code, VS Code, and Cursor.
@@ -96,18 +96,18 @@ Works on any Mac or Linux with curl. Installs Claude Code support. Re-run with N
 **Specific editors:**
 
 ```bash
-npx slopbuster --claude     # Claude Code → ~/.claude/
-npx slopbuster --vscode     # VS Code → .github/prompts/ + .vscode/mcp.json
-npx slopbuster --cursor     # Cursor → .cursor/rules/ + .cursor/mcp.json
-npx slopbuster --all        # All three editors
+npx github:kwad77/slopbuster --claude     # Claude Code → ~/.claude/
+npx github:kwad77/slopbuster --vscode     # VS Code → .github/prompts/ + .vscode/mcp.json
+npx github:kwad77/slopbuster --cursor     # Cursor → .cursor/rules/ + .cursor/mcp.json
+npx github:kwad77/slopbuster --all        # All three editors
 ```
 
 **Other options:**
 
 ```bash
-npx slopbuster --dry-run    # Preview what would be installed
-npx slopbuster --verbose    # Show each file as it installs
-npx slopbuster --uninstall  # Remove
+npx github:kwad77/slopbuster --dry-run    # Preview what would be installed
+npx github:kwad77/slopbuster --verbose    # Show each file as it installs
+npx github:kwad77/slopbuster --uninstall  # Remove
 ```
 
 No build step. No compilation. No runtime. SlopBuster is markdown files your editor reads directly. After install, `.slopbuster/` is ready in your project — edit `PROJECT.md` with your project name and core value, then start planning.

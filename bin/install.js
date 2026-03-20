@@ -32,7 +32,7 @@ if (has(FLAG.HELP) || args.includes('-h')) {
     'SlopBuster — constraint-first AI development',
     '',
     'Usage:',
-    '  npx slopbuster [options]',
+    '  npx github:kwad77/slopbuster [options]',
     '',
     'Installs slash commands for your AI editor AND scaffolds .slopbuster/ in',
     'the current directory so you can start planning immediately.',
@@ -516,7 +516,7 @@ if (flags.uninstall) {
     console.error('');
     console.error('  Error: src/ directory not found.');
     console.error('  This usually means the package was not installed correctly.');
-    console.error('  Try: npx slopbuster@latest');
+    console.error('  Try: npx github:kwad77/slopbuster');
     console.error('');
     process.exit(1);
   }
