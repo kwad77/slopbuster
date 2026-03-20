@@ -61,22 +61,43 @@ Then the 8-point pitfall checklist: business context alignment, schema backward 
 
 ---
 
+## Editor Support
+
+SlopBuster runs in Claude Code, VS Code (Copilot Chat), and Cursor. The same loop. The same Gate. The same constraints.
+
+| Editor | Commands | Gate enforcement |
+|--------|----------|-----------------|
+| Claude Code | `/sb:gate`, `/sb:plan`, etc. | Hard — `allowed_tools` blocks execution |
+| VS Code (Copilot) | `/sb-gate`, `/sb-plan`, etc. | Hard — MCP elicitation form dialog |
+| Cursor | `/sb-gate`, `/sb-plan`, etc. | Hard — MCP elicitation form dialog |
+
+VS Code 1.103+ and Cursor 1.5+ support MCP elicitation natively. When the Gate fires, it opens a native form dialog in your editor — not a chat message, an actual structured form. Your answers are written verbatim to `<constraints>` the moment you submit.
+
 ## Install
 
 ```bash
-npx slopbuster --global    # Install to ~/.claude/ — works in every project
-npx slopbuster --local     # Install to ./.claude/ — this project only
-npx slopbuster --dry-run   # Preview what would be installed
-npx slopbuster --verbose   # Show each file as it installs
-npx slopbuster --uninstall # Remove
+# Auto-detect editors present in your project
+npx slopbuster
+
+# Specific editors
+npx slopbuster --claude     # Claude Code → ~/.claude/
+npx slopbuster --vscode     # VS Code → .github/prompts/ + .vscode/mcp.json
+npx slopbuster --cursor     # Cursor → .cursor/rules/ + .cursor/mcp.json
+npx slopbuster --all        # All three editors
+
+# Options
+npx slopbuster --dry-run    # Preview what would be installed
+npx slopbuster --verbose    # Show each file as it installs
+npx slopbuster --uninstall  # Remove
 ```
 
-No build step. No compilation. No runtime. SlopBuster is markdown files that Claude Code reads directly. The installer copies them into place and rewrites path references. That's the whole system.
+No build step. No compilation. No runtime. SlopBuster is markdown files your editor reads directly. The installer copies them into place and rewrites path references. That's the whole system.
 
-Then open Claude Code and run:
+Then open your editor and run:
 
 ```
-/sb:help
+/sb:help        (Claude Code)
+/sb-help        (VS Code / Cursor)
 ```
 
 ---
@@ -200,6 +221,54 @@ The failure mode in AI-assisted development isn't that Claude writes bad code. I
 SlopBuster makes the constraints explicit before execution starts. The Gate forces the conversation you should have had anyway. The constraint block makes it impossible to forget. The verification checklist makes "done" mean something specific.
 
 If you're shipping fast and wondering why things keep needing to be redone — you're paying the slop tax.
+
+---
+
+## Enterprise Direction
+
+SlopBuster's GATE mechanism is structurally aligned with what every major AI governance framework requires: risk assessment before action, human oversight proportional to risk tier, and decision documentation. No other AI coding tool does this. Most are suggestion engines or post-generation scanners. SlopBuster enforces constraints before a single line of code is written.
+
+The roadmap is built in four phases. Each phase lays groundwork for the next.
+
+### Phase 1 — Compliance Foundation
+
+- **Compliance evidence pack** — GATE artifacts reformatted as compliance evidence. JSON event stream for SIEM ingest (Splunk, Sentinel, QRadar). One-command export for SOC 2 control evidence, HIPAA audit records, FedRAMP events.
+- **Dual attribution chain** — every Gate-cleared change signed with AI model identity + authenticated human + plan hash + timestamp. Non-repudiable. Solves the SOX/HIPAA question: "who is accountable when AI-generated code causes an incident?"
+- **Stewardship scaffolding** — `.slopbuster/stewards/` directory established. Data structures in GATE.md, STATE.md, and PLAN.md include stewardship slots from day one, even before stewardship is active.
+
+### Phase 2 — Identity and Risk Routing
+
+- **Identity-aware Gate** — SSO/SAML integration. User identity attached to every Gate decision. Role-based Gate authority: junior engineers clear LOW-risk plans; architects and leads clear HIGH.
+- **Risk classification** — every plan auto-classified as LOW / MEDIUM / HIGH / CRITICAL based on trigger count, file domains (auth, payments, PII), and dependency type. HIGH/CRITICAL plans route to mandatory ARB approval before Gate proceeds.
+- **ARB and change management integration** — Jira ticket auto-created for Gate-triggered plans. ServiceNow change request generated with risk tier pre-populated. GitHub/GitLab PRs annotated with Gate clearance status and link to GATE.md.
+
+### Phase 3 — Expert Stewardship
+
+The concept: domain teams own markdown files that automatically inject into the Gate when their domain is touched. The network team owns `network.md`. The DBA team owns `database.md`. The payments team owns `payments.md`. When a plan triggers a relevant domain, the stewardship file's additional questions and checklist items are added to that Gate interrogation — after the five core questions.
+
+```
+.slopbuster/stewards/
+├── network.md        ← Network team — asks about BGP failover, CIDR conflicts
+├── database.md       ← DBA team — asks about index strategy, migration reversibility
+├── payments.md       ← Payments team — PCI-DSS checklist items, fraud surface
+├── auth.md           ← Security team — threat model questions, token lifecycle
+└── infrastructure.md ← Platform/SRE — deployment blast radius, rollback runbooks
+```
+
+Stewardship files are version-controlled. Changes require review. When a post-incident review reveals "we should have asked about X" — the relevant team adds it to their file. Every future plan touching their domain inherits that institutional knowledge automatically.
+
+This is distributed governance at scale. No central team has to know everything. Each team encodes their expertise once. The Gate asks it forever.
+
+### Phase 4 — Governance Platform
+
+- **Governance framework modes** — config flag for NIST AI RMF, ISO 42001, EU AI Act, HIPAA, FedRAMP. Each mode produces evidence formatted to that framework's audit requirements.
+- **Provenance Bill of Materials** — every Gate-cleared plan generates a signed PBOM attached to the Git commit: model identity, plan hash, Gate Q&A hash, stewardship file versions, timestamp, risk classification.
+- **Compliance dashboard** — Gate clearance rates, override frequency, risk tier distribution, constraint quality scores, team-by-team governance posture. The QBR slide for your CISO.
+- **On-premises / air-gapped package** — Docker container, zero cloud dependency. Required for government, defense, and classified environments.
+
+---
+
+The positioning is deliberate. Current AI coding tools are suggestion engines or post-generation scanners — they operate after architectural decisions are already made. SlopBuster operates before. The constraint block is filled before execution starts. That's the only place where governance is actually enforceable.
 
 ---
 
