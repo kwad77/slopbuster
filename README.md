@@ -167,6 +167,11 @@ What this looks like in practice:
 | `/sb:fix [plan-number]` | Plan and execute fixes for UAT issues |
 | `/sb:audit [plan-path]` | Enterprise architectural audit |
 
+### Compliance
+| Command | What it does |
+|---------|-------------|
+| `/sb:export [framework]` | Export Gate records as compliance evidence (soc2, hipaa, fedramp, all) |
+
 ### Config
 | Command | What it does |
 |---------|-------------|

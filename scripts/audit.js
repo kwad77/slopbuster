@@ -65,11 +65,11 @@ const refScore = totalRefs === 0 ? 0 : Math.round(((totalRefs - brokenRefs) / to
 
 // ── 2. Completeness (35 pts) ────────────────────────────────────────────────
 
-// 2a. All 17 commands exist
+// 2a. All 18 commands exist
 const expectedCommands = [
   'help','init','plan','gate','apply','unify',
   'progress','resume','pause','discuss','research',
-  'milestone','roadmap','verify','fix','audit','config'
+  'milestone','roadmap','verify','fix','audit','config','export'
 ];
 let missingCommands = 0;
 for (const cmd of expectedCommands) {
@@ -473,11 +473,28 @@ const initCreatesStewards = initWf.includes('stewards');
 if (!initCreatesStewards) issue('init-project.md does not create .slopbuster/stewards/ directory');
 else pass('init-project.md creates .slopbuster/stewards/ directory');
 
+// 7l. export-workflow.md covers SOC 2 controls
+const exportWf = srcExists('workflows/export-workflow.md') ? readSrc('workflows/export-workflow.md') : '';
+const exportHasSoc2 = exportWf.includes('SOC 2') || exportWf.includes('CC8.1');
+if (!exportHasSoc2) issue('export-workflow.md missing SOC 2 compliance evidence mapping');
+else pass('export-workflow.md covers SOC 2 controls');
+
+// 7m. export-workflow.md covers HIPAA controls
+const exportHasHipaa = exportWf.includes('HIPAA') || exportWf.includes('§164');
+if (!exportHasHipaa) issue('export-workflow.md missing HIPAA compliance evidence mapping');
+else pass('export-workflow.md covers HIPAA controls');
+
+// 7n. export-workflow.md covers FedRAMP/NIST controls
+const exportHasFedramp = exportWf.includes('FedRAMP') || exportWf.includes('CM-3');
+if (!exportHasFedramp) issue('export-workflow.md missing FedRAMP/NIST compliance evidence mapping');
+else pass('export-workflow.md covers FedRAMP/NIST controls');
+
 const enterpriseChecks = [
   planHasRiskTier, planHasDomain, planHasStewardFiles,
   gateHasAttribution, gateHasRiskClass, gateHasDomainContext,
   configHasStewards, gateWfHasStewardImport, gateWfWritesRiskTier,
   planWfHasDomainDetect, initCreatesStewards,
+  exportHasSoc2, exportHasHipaa, exportHasFedramp,
 ];
 const enterprisePassing = enterpriseChecks.filter(Boolean).length;
 const enterpriseScore = Math.round(20 * (enterprisePassing / enterpriseChecks.length));
