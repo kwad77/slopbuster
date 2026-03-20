@@ -104,6 +104,13 @@ Then open your editor and run:
 
 ---
 
+## Example Workflows
+
+- [Greenfield — new project with governance from day one](docs/greenfield-flow.md)
+- [Brownfield — dropping governance into an existing codebase](docs/brownfield-flow.md)
+
+---
+
 ## Quick Start
 
 ```
