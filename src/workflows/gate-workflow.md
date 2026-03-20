@@ -313,14 +313,37 @@ Also write the Risk Classification and Attribution sections of GATE.md:
 **Steward files active:** [list or none]
 ```
 
-### 9. Update STATE.md
+### 9. Write Change Record
+
+Create `.slopbuster/records/[plan-hash-12]-CHANGE-RECORD.md`
+
+Use the template at @src/templates/CHANGE-RECORD.md
+
+The Change Record is a **standalone, self-contained document** designed to be:
+- Downloaded and shared with change managers or compliance teams
+- Submitted to a change management system (ServiceNow, Jira) in the future
+- Attached to the PR that implements this plan
+
+Fill in every section from what was gathered during the Gate:
+- Change Identification: plan hash (first 12 chars), plan ref, phase, timestamp
+- Change Classification: risk tier, domains, triggers, steward sign-off
+- Change Description: pull `<objective>` content and `files_modified` from PLAN.md; summarize `<acceptance_criteria>` (one line per AC)
+- Architectural Assessment: Q1–Q5 verbatim answers (exact developer words)
+- Risk Assessment: 8-point checklist results and open risk items
+- Domain Expert Input: steward Q&A verbatim (or note "No domain stewards active")
+- Authorization Chain: cleared_by, model, plan_hash, approved_by (pending if not yet set)
+- Integration: leave as "not configured" until change management integration is wired
+
+The `records/` directory is flat — one file per plan, named by hash. This makes it easy to reference, share, or pipe into a CI/CD artifact uploader.
+
+### 10. Update STATE.md
 
 - Remove `# gate_pending:` line
 - Update Loop Position to GATE ✓
 - Update Last: timestamp + "Gate cleared: [NN]-[PP]-PLAN.md"
 - Update Next: `/sb:apply .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-PLAN.md`
 
-### 10. Confirm
+### 11. Confirm
 
 ```
 [GATE ✓] Circuit breaker cleared.
@@ -331,6 +354,7 @@ Constraints: 5 core answers (verbatim) → <constraints>
 Checklist:   [N]/8 confirmed  |  [N] open risks
 Stewards:    [N files active — domain questions + checklist items | none]
 GATE.md:     .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-GATE.md
+Record:      .slopbuster/records/[plan-hash-12]-CHANGE-RECORD.md
 
 PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○
 

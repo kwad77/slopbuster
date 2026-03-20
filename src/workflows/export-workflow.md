@@ -16,13 +16,13 @@ Output directory: `.slopbuster/exports/{YYYY-MM-DD}-{framework}/`
 
 For `all`, create one directory per framework.
 
-### 2. Discover Gate records
+### 2. Discover Change Records
 
-Glob all `*-GATE.md` files in `.slopbuster/phases/**`.
+First, glob all `*-CHANGE-RECORD.md` files in `.slopbuster/records/`. These are the primary, self-contained change artifacts.
 
-Sort chronologically by filename (NN-PP prefix).
+If records/ is empty, fall back to globbing all `*-GATE.md` files in `.slopbuster/phases/**` — older plans created before /sb:export was available.
 
-If no GATE.md files found:
+Sort chronologically. If no records found at all:
 ```
 No Gate clearance records found. Run /sb:gate to clear a plan first.
 ```

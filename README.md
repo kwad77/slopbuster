@@ -188,7 +188,9 @@ After `/sb:init`, your project gets:
 ├── PROJECT.md          # Project name, core value, stack, constraints
 ├── ROADMAP.md          # Milestones and phases
 ├── STATE.md            # Current loop position, decisions, resume point
-├── config.md           # Gate thresholds, enterprise settings
+├── config.md           # Gate thresholds, routing, enterprise settings
+├── records/            # Change Records — one per plan, named by plan hash
+│   └── a3f9c2e1b4d7-CHANGE-RECORD.md   # Standalone artifact: all Gate answers + auth chain
 ├── stewards/           # Domain team stewardship files (optional)
 │   ├── README.md       # Format guide for steward files
 │   └── database.md     # Example: DBA team owns Gate questions for DB changes

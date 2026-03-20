@@ -42,6 +42,7 @@ Create:
 - `.slopbuster/`
 - `.slopbuster/phases/`
 - `.slopbuster/stewards/`
+- `.slopbuster/records/`
 
 ### 4. Write PROJECT.md
 
