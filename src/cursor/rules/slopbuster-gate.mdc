@@ -26,9 +26,15 @@ If no thresholds fire: auto-clear (write `<!-- Gate auto-cleared: no thresholds 
 
 ## Step 3 — Gate enforcement
 
-**If the `slopbuster_gate` MCP tool is available:** call it. The tool opens a native elicitation form, collects the 5 answers, and writes them verbatim to PLAN.md. You do not need to ask the questions.
+**If the `slopbuster_gate` MCP tool is available:** call it. The tool opens a native elicitation form, collects the 5 core questions plus any active domain steward questions, and writes answers verbatim to PLAN.md and GATE.md. You do not need to ask the questions.
 
 **If MCP is not available:** ask each question in sequence. Wait for a complete answer before moving to the next. Do not combine questions.
+
+## Step 3b — Domain stewards
+
+Check `.slopbuster/stewards/*.md` (skip README.md). A steward is **active** if its `triggers:` intersects the plan's `domain:` OR its `file_paths:` globs match files in `<files>` tags.
+
+If active, note the steward owners. Ask their questions after Q5.
 
 ### The 5 Questions
 
@@ -47,9 +53,21 @@ Which endpoints are protected vs. public? What inputs are validated? What must n
 **Q5 — Rollback**
 If this plan fails mid-execution, how do you recover? Is the migration reversible? Can services restart safely? What is the manual recovery path?
 
+### Domain steward questions (after Q5)
+
+Ask each active steward's `## Additional Gate Questions` one at a time, labeled:
+
+```
+[Database Steward — DBA Team]
+Q-Database-1: [title]
+[full question text]
+```
+
+Domain answers → `## Domain Context` in GATE.md (NOT `<constraints>`).
+
 ## Step 4 — Inject constraints verbatim
 
-Write the developer's exact answers into `<constraints>` in PLAN.md:
+Write the developer's exact Q1–Q5 answers into `<constraints>` in PLAN.md:
 
 ```xml
 <constraints>
@@ -78,10 +96,14 @@ Set in PLAN.md frontmatter:
 - `gate_cleared: true`
 - `gate_date: [ISO timestamp]`
 - `gate_triggered_by: "[triggers that fired]"`
+- `risk_tier: [LOW|MEDIUM|HIGH|CRITICAL]` — no triggers=LOW, 1-2=MEDIUM, 3+=HIGH, auth+(db or api)=CRITICAL
+- `domain: [list]`
+- `steward_files: [list or []]`
 
 In STATE.md:
 - Remove `# gate_pending:` line
 - Update loop position to `GATE ✓`
+- Update `## Active Stewards` with matched steward files
 
 ## Step 6 — Confirm
 
@@ -89,7 +111,9 @@ In STATE.md:
 [GATE ✓] Circuit breaker cleared.
 
 Triggers:    [list]
+Risk tier:   [LOW|MEDIUM|HIGH|CRITICAL]
 Constraints: 5 answers injected verbatim
+Stewards:    [N files active | none]
 
 PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○
 

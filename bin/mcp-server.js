@@ -10,6 +10,9 @@
  *
  * Tools:
  *   slopbuster_gate    — run the Gate circuit breaker with elicitation
+ *                        Supports active stewardship: domain team questions
+ *                        are appended to the elicitation form when steward
+ *                        files match the plan's detected domains.
  *   slopbuster_status  — read current loop state from STATE.md
  */
 
@@ -45,8 +48,9 @@ const TOOLS = [
     description:
       'Run the SlopBuster Gate circuit breaker. ' +
       'Reads the target PLAN.md, checks thresholds, opens a native form for the ' +
-      '5 architectural questions, and writes developer answers verbatim into ' +
-      '<constraints>. APPLY is unblocked once this tool returns successfully.',
+      '5 architectural questions plus any active domain steward questions, and writes ' +
+      'developer answers verbatim into <constraints> and Domain Context. ' +
+      'APPLY is unblocked once this tool returns successfully.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -113,6 +117,156 @@ function checkThresholds(planContent) {
   return THRESHOLD_CHECKS.filter((c) => c.test(planContent)).map((c) => c.id);
 }
 
+// ─── Stewardship ─────────────────────────────────────────────────────────────
+
+/**
+ * Parse a stewardship file into its components.
+ * Returns { owner, triggers, filePaths, questions, checklistItems, approvedPatterns, antiPatterns }
+ */
+function parseStewardFile(content, filename) {
+  // Parse YAML frontmatter
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  let owner = filename;
+  let triggers = [];
+  let filePaths = [];
+
+  if (fmMatch) {
+    const fm = fmMatch[1];
+    const ownerMatch = fm.match(/^owner:\s*"?(.+?)"?\s*$/m);
+    if (ownerMatch) owner = ownerMatch[1].replace(/^"|"$/g, '').replace(/\[.*?\]/g, '').trim();
+
+    const triggersMatch = fm.match(/^triggers:\s*\[([^\]]*)\]/m);
+    if (triggersMatch) {
+      triggers = triggersMatch[1].split(',').map((s) => s.trim().replace(/"/g, '').replace(/'/g, '')).filter(Boolean);
+    }
+
+    const fpMatch = fm.match(/^file_paths:\s*\[([^\]]*)\]/m);
+    if (fpMatch) {
+      filePaths = fpMatch[1].split(',').map((s) => s.trim().replace(/"/g, '').replace(/'/g, '')).filter(Boolean);
+    }
+  }
+
+  // Parse ## Additional Gate Questions → ### Q-* entries
+  const questions = [];
+  const qSection = content.match(/## Additional Gate Questions([\s\S]*?)(?=^## |\Z)/m);
+  if (qSection) {
+    const qBlocks = qSection[1].split(/(?=^### Q-)/m).filter((b) => b.trim());
+    for (const block of qBlocks) {
+      const titleMatch = block.match(/^### (Q-[^:\n]+):\s*(.+)/m);
+      if (titleMatch) {
+        const id = titleMatch[1].trim();
+        const title = titleMatch[2].trim();
+        const body = block.replace(/^### .+\n/, '').trim();
+        questions.push({ id, title, body });
+      }
+    }
+  }
+
+  // Parse ## Required Checklist Items → - [ ] lines
+  const checklistItems = [];
+  const clSection = content.match(/## Required Checklist Items([\s\S]*?)(?=^## |\Z)/m);
+  if (clSection) {
+    for (const line of clSection[1].split('\n')) {
+      const m = line.match(/^-\s*\[\s*\]\s*(.+)/);
+      if (m) checklistItems.push(m[1].trim());
+    }
+  }
+
+  // Parse ## Approved Patterns
+  const approvedPatterns = [];
+  const apSection = content.match(/## Approved Patterns([\s\S]*?)(?=^## |\Z)/m);
+  if (apSection) {
+    for (const line of apSection[1].split('\n')) {
+      const m = line.match(/^-\s*(.+)/);
+      if (m && !m[1].startsWith('[')) approvedPatterns.push(m[1].trim());
+    }
+  }
+
+  // Parse ## Anti-Patterns
+  const antiPatterns = [];
+  const antiSection = content.match(/## Anti-Patterns([\s\S]*?)(?=^## |\Z)/m);
+  if (antiSection) {
+    for (const line of antiSection[1].split('\n')) {
+      const m = line.match(/^-\s*(.+)/);
+      if (m && !m[1].startsWith('[')) antiPatterns.push(m[1].trim());
+    }
+  }
+
+  return { owner, triggers, filePaths, questions, checklistItems, approvedPatterns, antiPatterns };
+}
+
+/**
+ * Simple glob match: check if a file path matches a glob pattern.
+ * Supports ** (any path segment), * (any chars in segment), literal chars.
+ */
+function globMatch(pattern, filePath) {
+  // Normalise separators
+  const p = pattern.replace(/\\/g, '/').replace(/\*\*\//g, '{{GLOBSTAR}}/').replace(/\*\*/g, '{{GLOBSTAR}}');
+  const escaped = p.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/{{GLOBSTAR}}/g, '.*').replace(/\*/g, '[^/]*');
+  return new RegExp(escaped, 'i').test(filePath.replace(/\\/g, '/'));
+}
+
+/**
+ * Read and match steward files against the plan.
+ * Returns array of { filename, parsed } for matching stewards.
+ */
+function loadMatchingStewards(cwd, planContent, planDomains) {
+  const stewardsDir = path.join(cwd, '.slopbuster', 'stewards');
+  if (!fs.existsSync(stewardsDir)) return [];
+
+  // Extract file paths from plan <files> tags
+  const planFilePaths = [];
+  for (const m of planContent.matchAll(/<files>([\s\S]*?)<\/files>/g)) {
+    for (const line of m[1].split('\n')) {
+      const t = line.trim().replace(/^[-*]\s*/, '');
+      if (t) planFilePaths.push(t);
+    }
+  }
+
+  const matches = [];
+  for (const filename of fs.readdirSync(stewardsDir)) {
+    if (!filename.endsWith('.md') || filename === 'README.md') continue;
+    const content = fs.readFileSync(path.join(stewardsDir, filename), 'utf8');
+    const parsed = parseStewardFile(content, filename);
+
+    // Trigger match: steward triggers list intersects plan domain list
+    const triggerMatch = parsed.triggers.some((t) =>
+      planDomains.map((d) => d.toLowerCase()).includes(t.toLowerCase()),
+    );
+
+    // File path match: any plan file matches any steward glob
+    const fileMatch = parsed.filePaths.length > 0 &&
+      planFilePaths.some((fp) =>
+        parsed.filePaths.some((glob) => globMatch(glob, fp)),
+      );
+
+    if (triggerMatch || fileMatch) {
+      matches.push({ filename, parsed });
+    }
+  }
+
+  return matches;
+}
+
+/**
+ * Read plan's domain: frontmatter field.
+ */
+function getPlanDomains(planContent) {
+  const m = planContent.match(/^domain:\s*\[([^\]]*)\]/m);
+  if (!m) return [];
+  return m[1].split(',').map((s) => s.trim().replace(/"/g, '').replace(/'/g, '')).filter(Boolean);
+}
+
+/**
+ * Read stewards.enabled from config.
+ */
+function stewardsEnabled(cwd) {
+  const configPath = path.join(cwd, '.slopbuster', 'config.md');
+  if (!fs.existsSync(configPath)) return false;
+  const config = fs.readFileSync(configPath, 'utf8');
+  return /stewards:\s*\n\s+enabled:\s*true/m.test(config);
+}
+
 // ─── STATE.md helpers ─────────────────────────────────────────────────────────
 
 function readState(cwd) {
@@ -120,13 +274,25 @@ function readState(cwd) {
   return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
 }
 
-function updateStateGateCleared(cwd, planPath, ts) {
+function updateStateGateCleared(cwd, planPath, ts, activeStewards) {
   const p = path.join(cwd, '.slopbuster', 'STATE.md');
   if (!fs.existsSync(p)) return;
   let s = fs.readFileSync(p, 'utf8');
   s = s.replace(/^# gate_pending:.*\n?/m, '');
   s = s.replace(/GATE\s+[○⚠◉⊘]/g, 'GATE ✓');
   s = s.replace(/\bLast:.*$/m, `Last: ${ts} — Gate cleared`);
+
+  // Update Active Stewards section
+  if (activeStewards && activeStewards.length > 0) {
+    const stewardLines = activeStewards
+      .map(({ filename, parsed }) => `- ${filename.replace('.md', '')}: ${filename} (${parsed.owner})`)
+      .join('\n');
+    s = s.replace(
+      /## Active Stewards\n[^\n]*none[^\n]*/m,
+      `## Active Stewards\n${stewardLines}`,
+    );
+  }
+
   fs.writeFileSync(p, s, 'utf8');
 }
 
@@ -164,90 +330,125 @@ async function handleGate(args) {
     return ok(`Gate already cleared for this plan.\n\nNext: /sb-apply`);
   }
 
-  // 3. Read thresholds from config if present
-  const triggers = checkThresholds(plan);
   const ts = new Date().toISOString();
 
-  // 4. Auto-clear if no thresholds fired
-  if (triggers.length === 0) {
-    plan = injectConstraints(
-      plan,
-      `<!-- Gate auto-cleared on ${ts}: no thresholds met -->`,
-    );
-    plan = setFrontmatter(plan, { gate_cleared: 'true', gate_date: ts });
+  // 3. Load active steward files
+  const planDomains = getPlanDomains(plan);
+  const activeStewards = stewardsEnabled(cwd)
+    ? loadMatchingStewards(cwd, plan, planDomains)
+    : [];
+
+  // 4. Check thresholds
+  const triggers = checkThresholds(plan);
+
+  // 5. Auto-clear if no thresholds fired and no stewards with questions
+  const stewardQuestions = activeStewards.flatMap(({ filename, parsed }) =>
+    parsed.questions.map((q) => ({ filename, parsed, q })),
+  );
+
+  if (triggers.length === 0 && stewardQuestions.length === 0) {
+    plan = injectConstraints(plan, `<!-- Gate auto-cleared on ${ts}: no thresholds met -->`);
+    plan = setFrontmatter(plan, {
+      gate_cleared: 'true',
+      gate_date: ts,
+      risk_tier: 'LOW',
+      'steward_files: []': null, // already []
+    });
     fs.writeFileSync(absPath, plan, 'utf8');
-    updateStateGateCleared(cwd, planPath, ts);
+    updateStateGateCleared(cwd, planPath, ts, []);
     return ok(
       `[GATE ✓ auto] No thresholds met — cleared automatically.\n\n` +
         `PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○\n\nNext: /sb-apply`,
     );
   }
 
-  // 5. Elicit the 5 Gate questions via native editor form
+  // 6. Build elicitation schema — 5 core questions + steward questions
+  const properties = {
+    connectivity: {
+      type: 'string',
+      description:
+        'Q1 — Connectivity: What systems does this plan connect to or affect? ' +
+        'List all downstream dependencies, webhooks, and clients. ' +
+        'What is the blast radius if this rolls back?',
+    },
+    performance: {
+      type: 'string',
+      description:
+        'Q2 — Performance: What are the latency targets? ' +
+        'Where are the DB queries and do they use indexes? ' +
+        'What is the memory profile under load?',
+    },
+    concurrency: {
+      type: 'string',
+      description:
+        'Q3 — Concurrency: Are write operations idempotent? ' +
+        'What are the race conditions? What is the locking and tie-break strategy?',
+    },
+    security: {
+      type: 'string',
+      description:
+        'Q4 — Security: Which endpoints are protected vs. public? ' +
+        'What inputs are validated? What must never be logged? ' +
+        'How are secrets managed?',
+    },
+    rollback: {
+      type: 'string',
+      description:
+        'Q5 — Rollback: If this plan fails mid-execution, how do you recover? ' +
+        'Is the migration reversible? Can services restart safely? ' +
+        'What is the manual recovery path?',
+    },
+  };
+
+  const required = ['connectivity', 'performance', 'concurrency', 'security', 'rollback'];
+
+  // Append steward questions to schema
+  const stewardFieldMap = {}; // fieldKey -> { filename, q }
+  for (const { filename, parsed, q } of stewardQuestions) {
+    const fieldKey = q.id.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const stewardLabel = filename.replace('.md', '');
+    properties[fieldKey] = {
+      type: 'string',
+      description: `[${stewardLabel} — ${parsed.owner}] ${q.title}: ${q.body.substring(0, 200)}`,
+    };
+    required.push(fieldKey);
+    stewardFieldMap[fieldKey] = { filename, parsed, q };
+  }
+
+  // Build message with steward summary if any active
+  let message =
+    `SlopBuster Gate — ${triggers.length > 0 ? triggers.join(', ') + ' triggered' : 'steward questions required'}.\n\n` +
+    `Answer all ${required.length} questions. Your exact words become the execution contract.`;
+
+  if (activeStewards.length > 0) {
+    const stewardSummary = activeStewards
+      .map(({ filename, parsed }) => `  ${filename} (${parsed.owner}) — ${parsed.questions.length} questions`)
+      .join('\n');
+    message += `\n\nActive stewards:\n${stewardSummary}`;
+  }
+
+  // 7. Elicit
   let elicit;
   try {
     elicit = await sendRequest('elicitation/create', {
-      message:
-        `SlopBuster Gate — ${triggers.join(', ')} triggered.\n\n` +
-        `Answer all 5 questions. Your exact words become the execution contract — ` +
-        `they are never summarized or rephrased.`,
-      requestedSchema: {
-        type: 'object',
-        properties: {
-          connectivity: {
-            type: 'string',
-            description:
-              'Q1 — Connectivity: What systems does this plan connect to or affect? ' +
-              'List all downstream dependencies, webhooks, and clients. ' +
-              'What is the blast radius if this rolls back?',
-          },
-          performance: {
-            type: 'string',
-            description:
-              'Q2 — Performance: What are the latency targets? ' +
-              'Where are the DB queries and do they use indexes? ' +
-              'What is the memory profile under load?',
-          },
-          concurrency: {
-            type: 'string',
-            description:
-              'Q3 — Concurrency: Are write operations idempotent? ' +
-              'What are the race conditions? What is the locking and tie-break strategy?',
-          },
-          security: {
-            type: 'string',
-            description:
-              'Q4 — Security: Which endpoints are protected vs. public? ' +
-              'What inputs are validated? What must never be logged? ' +
-              'How are secrets managed?',
-          },
-          rollback: {
-            type: 'string',
-            description:
-              'Q5 — Rollback: If this plan fails mid-execution, how do you recover? ' +
-              'Is the migration reversible? Can services restart safely? ' +
-              'What is the manual recovery path?',
-          },
-        },
-        required: ['connectivity', 'performance', 'concurrency', 'security', 'rollback'],
-      },
+      message,
+      requestedSchema: { type: 'object', properties, required },
     });
   } catch (e) {
     return err(
       `Elicitation failed: ${e.message || e}\n\n` +
-        `Fallback: run /sb-gate in Claude Code, or answer the 5 Gate questions ` +
-        `conversationally and paste them into the <constraints> section of ${planPath}.`,
+        `Fallback: run /sb-gate in Claude Code, or answer the Gate questions ` +
+        `conversationally and paste them into ${planPath}.`,
     );
   }
 
-  // User cancelled the form
   if (!elicit || elicit.action === 'cancel') {
     return ok('Gate cancelled. APPLY remains blocked until the Gate is cleared.');
   }
 
   const a = elicit.content;
 
-  // 6. Inject answers verbatim
+  // 8. Inject core answers verbatim into <constraints>
   const constraintBody =
     `## Q1 — Connectivity\n${a.connectivity}\n\n` +
     `## Q2 — Performance\n${a.performance}\n\n` +
@@ -256,19 +457,54 @@ async function handleGate(args) {
     `## Q5 — Rollback\n${a.rollback}`;
 
   plan = injectConstraints(plan, constraintBody);
+
+  // 9. Compute risk tier
+  let riskTier = 'LOW';
+  if (triggers.length >= 3) riskTier = 'HIGH';
+  else if (triggers.length >= 1) riskTier = 'MEDIUM';
+  if (triggers.includes('auth-session') && (triggers.includes('database-schema') || triggers.includes('api-contract'))) {
+    riskTier = 'CRITICAL';
+  }
+
+  // 10. Update PLAN.md frontmatter
+  const stewardFileNames = activeStewards.map(({ filename }) => filename);
   plan = setFrontmatter(plan, {
     gate_cleared: 'true',
     gate_date: ts,
     gate_triggered_by: `"${triggers.join(', ')}"`,
+    risk_tier: riskTier,
+    domain: `[${planDomains.join(', ')}]`,
+    steward_files: `[${stewardFileNames.map((f) => `"${f}"`).join(', ')}]`,
   });
+
   fs.writeFileSync(absPath, plan, 'utf8');
-  updateStateGateCleared(cwd, planPath, ts);
+  updateStateGateCleared(cwd, planPath, ts, activeStewards);
+
+  // 11. Build result summary
+  let domainContextLines = '';
+  if (Object.keys(stewardFieldMap).length > 0) {
+    const byFile = {};
+    for (const [fieldKey, { filename, parsed, q }] of Object.entries(stewardFieldMap)) {
+      if (!byFile[filename]) byFile[filename] = { parsed, items: [] };
+      byFile[filename].items.push({ q, answer: a[fieldKey] || '(no answer provided)' });
+    }
+    domainContextLines = '\n\nDomain context (steward answers):\n';
+    for (const [filename, { parsed, items }] of Object.entries(byFile)) {
+      domainContextLines += `  ${filename} (${parsed.owner}):\n`;
+      for (const { q, answer } of items) {
+        domainContextLines += `    ${q.id}: ${answer.substring(0, 80)}…\n`;
+      }
+    }
+  }
 
   return ok(
     `[GATE ✓] Circuit breaker cleared.\n\n` +
-      `Triggers:   ${triggers.join(', ')}\n` +
-      `Constraints: 5 answers injected verbatim\n\n` +
-      `PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○\n\nNext: /sb-apply`,
+      `Triggers:    ${triggers.length > 0 ? triggers.join(', ') : 'none'}\n` +
+      `Risk tier:   ${riskTier}\n` +
+      `Constraints: 5 core answers injected verbatim → <constraints>\n` +
+      `Stewards:    ${activeStewards.length > 0 ? activeStewards.map((s) => s.filename).join(', ') : 'none'}` +
+      domainContextLines +
+      `\n\nPLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○\n\nNext: /sb-apply`,
   );
 }
 
@@ -297,10 +533,10 @@ function injectConstraints(plan, body) {
 function setFrontmatter(plan, fields) {
   let result = plan;
   for (const [key, value] of Object.entries(fields)) {
-    if (new RegExp(`^${key}:`, 'm').test(result)) {
-      result = result.replace(new RegExp(`^${key}:.*$`, 'm'), `${key}: ${value}`);
+    if (value === null) continue; // skip null sentinels
+    if (new RegExp(`^${key.replace(/[[\]]/g, '\\$&')}:`, 'm').test(result)) {
+      result = result.replace(new RegExp(`^${key.replace(/[[\]]/g, '\\$&')}:.*$`, 'm'), `${key}: ${value}`);
     } else {
-      // Insert after opening ---
       result = result.replace(/^---\n/, `---\n${key}: ${value}\n`);
     }
   }
@@ -360,7 +596,7 @@ rl.on('line', async (line) => {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {}, elicitation: {} },
-        serverInfo: { name: 'slopbuster', version: '0.2.0' },
+        serverInfo: { name: 'slopbuster', version: '0.3.0' },
       },
     });
   } else if (msg.method === 'tools/list') {

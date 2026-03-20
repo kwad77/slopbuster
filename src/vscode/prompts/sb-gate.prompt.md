@@ -7,7 +7,7 @@ Run the SlopBuster Gate circuit breaker.
 
 ## Step 1 — Use MCP tool if available
 
-**If the `slopbuster_gate` MCP tool is connected:** call it with the plan path (or omit to auto-detect from STATE.md). The tool opens a native form dialog for the 5 questions, collects answers, and writes them verbatim to `<constraints>`. You are done when the tool returns.
+**If the `slopbuster_gate` MCP tool is connected:** call it with the plan path (or omit to auto-detect from STATE.md). The tool opens a native form dialog for the 5 core questions plus any active domain steward questions, collects answers, and writes them verbatim to `<constraints>` and GATE.md. You are done when the tool returns.
 
 **If MCP is not available:** continue with the manual flow below.
 
@@ -33,7 +33,15 @@ Check `gate_cleared` in PLAN.md frontmatter. If `true`: report gate already clea
 
 If no thresholds fire: auto-clear and stop.
 
-### 3. Ask the 5 questions (one at a time, wait for full answer)
+### 3. Check for active domain stewards
+
+Read `.slopbuster/stewards/*.md` (skip README.md). A steward file is **active** if:
+- Its `triggers:` frontmatter intersects the plan's `domain:` frontmatter, OR
+- Any `file_paths:` glob matches a file in the plan's `<files>` tags
+
+If stewards are active, note their owners and queued domain questions before asking Q1.
+
+### 4. Ask the 5 questions (one at a time, wait for full answer)
 
 **Q1 — Connectivity**
 What systems does this plan connect to or affect? List all downstream dependencies, webhooks, and clients. What is the blast radius if this rolls back?
@@ -50,9 +58,22 @@ Which endpoints are protected vs. public? What inputs are validated? What must n
 **Q5 — Rollback**
 If this plan fails mid-execution, how do you recover? Is the migration reversible? Can services restart safely? What is the manual recovery path?
 
-### 4. Inject verbatim
+### 4b. Domain steward questions (if any active)
 
-Write exact answers into `<constraints>` in PLAN.md — never summarize, never rephrase.
+After Q5, ask each steward's questions — one at a time, labeled by team:
+
+```
+[Database Steward — DBA Team]
+
+Q-Database-1: [title]
+[full question text]
+```
+
+Domain answers go to `## Domain Context` in GATE.md, **not** to `<constraints>`.
+
+### 5. Inject verbatim
+
+Write exact Q1–Q5 answers into `<constraints>` in PLAN.md — never summarize, never rephrase.
 
 ```xml
 <constraints>
@@ -73,18 +94,22 @@ Write exact answers into `<constraints>` in PLAN.md — never summarize, never r
 </constraints>
 ```
 
-### 5. Update PLAN.md and STATE.md
+### 6. Update PLAN.md and STATE.md
 
-Set `gate_cleared: true`, `gate_date: [ISO timestamp]`, `gate_triggered_by: "[triggers]"` in PLAN.md frontmatter.
+Set `gate_cleared: true`, `gate_date: [ISO timestamp]`, `gate_triggered_by: "[triggers]"`, `risk_tier: [LOW|MEDIUM|HIGH|CRITICAL]`, `domain: [list]`, `steward_files: [list]` in PLAN.md frontmatter.
 Remove `# gate_pending:` from STATE.md. Update loop to `GATE ✓`.
 
-### 6. Confirm
+Risk tier: no triggers → LOW, 1–2 → MEDIUM, 3+ → HIGH, auth + (database or api) → CRITICAL.
+
+### 7. Confirm
 
 ```
 [GATE ✓] Circuit breaker cleared.
 
 Triggers:    [list]
+Risk tier:   [LOW|MEDIUM|HIGH|CRITICAL]
 Constraints: 5 answers injected verbatim
+Stewards:    [N files active | none]
 
 PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○
 

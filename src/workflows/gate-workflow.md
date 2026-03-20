@@ -35,17 +35,44 @@ Check `stewards.enabled` in `.slopbuster/config.md`.
 - Continue to step 2
 
 **If `stewards.enabled: true`:**
-- Read the detected `domain:` list from PLAN.md frontmatter
-- For each domain, check if a matching file exists in `.slopbuster/stewards/`
-  (e.g., domain: database → look for `database.md`)
-- Also check file paths in the plan against `file paths:` globs in each stewardship file
-- For each matching steward file:
-  - Read its Additional Gate Questions and Required Checklist Items
-  - Record it in `steward_files` in PLAN.md frontmatter
-  - Record it in the Attribution section of GATE.md
-  - Queue its questions to be asked after Q5 in step 4
-  - Queue its checklist items to be evaluated in step 5
-- If no matches: note `stewards: enabled, no domain matches` in GATE.md Domain Context
+
+Read all `.md` files in `.slopbuster/stewards/` (excluding `README.md`).
+
+For each steward file, check if it matches this plan via either:
+- **Trigger match** — the file's `triggers:` frontmatter list contains any value from the plan's `domain:` frontmatter list
+- **File path match** — any file listed in the plan's `<files>` tags matches any glob pattern in the file's `file_paths:` frontmatter list (treat `**/foo/**` as "path contains foo")
+
+For each matching steward file:
+
+1. Parse its sections:
+   - `## Additional Gate Questions` → each `### Q-*` heading + body text is a queued domain question
+   - `## Required Checklist Items` → `- [ ]` lines are queued checklist items
+   - `## Approved Patterns` → bullet list, check against plan content for pre-clearance
+   - `## Anti-Patterns` → bullet list, show as warnings during Gate
+
+2. Check Approved Patterns against the plan content. If a plan's approach matches an approved pattern, note it — the domain checklist items for that steward may be pre-cleared.
+
+3. Check Anti-Patterns against the plan content. If a plan mentions an anti-pattern, flag it prominently before proceeding.
+
+4. Record the match:
+   - Add the steward filename to `steward_files` in PLAN.md frontmatter
+   - Add an entry to `## Active Stewards` in STATE.md: `[domain]: [filename] ([owner])`
+
+Show a brief stewardship summary before questions begin:
+```
+Stewardship active:
+  database.md  (DBA Team) — 2 additional questions, 3 checklist items
+  auth.md      (Security Team) — 1 additional question, 2 checklist items
+
+Anti-pattern warning: [description if any matched]
+```
+
+Queue all domain questions to be asked after Q5 in step 4.
+Queue all domain checklist items to be evaluated in step 5.
+
+**If no steward files match:**
+- Note `stewards: enabled, no domain matches for [domain list]` in GATE.md Domain Context
+- Continue as normal
 
 ### 2. Trigger analysis
 
@@ -123,6 +150,39 @@ If this plan fails mid-execution, how do you recover? Is the migration reversibl
 
 ---
 
+### 4b. Domain steward questions (if any active)
+
+If steward files matched in step 1b, ask each queued domain question now — after Q5, before the checklist.
+
+Present each domain question the same way as Q1–Q5: one at a time, wait for full answer, do not combine.
+
+Label each clearly so the developer knows which team's question it is:
+
+```
+[Database Steward — DBA Team]
+
+Q-Database-1: Index strategy
+
+[full question text from steward file]
+
+*(Wait for full answer before continuing)*
+```
+
+Domain answers are **verbatim** — write them to the `## Domain Context` section of GATE.md, not to `<constraints>`. The `<constraints>` section contains only the 5 core answers. Domain context is supplementary governance evidence.
+
+Format for GATE.md Domain Context:
+```
+## Domain Context
+
+### database.md (DBA Team)
+
+#### Q-Database-1: [title]
+[Developer's exact words]
+
+#### Q-Database-2: [title]
+[Developer's exact words]
+```
+
 ### 5. 8-Point Pitfall Checklist
 
 Assess each item against the plan and the answers just given. Note status and any open risks.
@@ -139,6 +199,20 @@ Assess each item against the plan and the answers just given. Note status and an
 | 8 | Alternative Solutions Matrix | ✓ / ⚠ | Simpler approach considered? |
 
 List any items marked ⚠ as open risks.
+
+### 5b. Domain steward checklist (if any active)
+
+If steward files matched, run their Required Checklist Items now — after the 8-point checklist.
+
+Group by steward file and label the source:
+
+```
+[Database Steward checklist — DBA Team]
+✓ / ⚠  Change reviewed against the DB Change Management runbook
+✓ / ⚠  Migration tested with production data volume in staging
+```
+
+Add domain checklist results to GATE.md after the core 8-point checklist table.
 
 ### 6. Inject constraints verbatim
 
@@ -227,10 +301,12 @@ Also write the Risk Classification and Attribution sections of GATE.md:
 ```
 [GATE ✓] Circuit breaker cleared.
 
-Triggers:   [list that fired]
-Constraints injected: 5 answers (verbatim)
-Checklist:  [N]/8 confirmed  |  [N] open risks
-GATE.md:    .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-GATE.md
+Triggers:    [list that fired]
+Risk tier:   [LOW | MEDIUM | HIGH | CRITICAL]
+Constraints: 5 core answers (verbatim) → <constraints>
+Checklist:   [N]/8 confirmed  |  [N] open risks
+Stewards:    [N files active — domain questions + checklist items | none]
+GATE.md:     .slopbuster/phases/{NN}-{slug}/{NN}-{PP}-GATE.md
 
 PLAN ✓ ──▶ GATE ✓ ──▶ APPLY ○ ──▶ UNIFY ○
 
