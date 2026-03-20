@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 960" width="800" height="960">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#94A3B8"/>
+    </marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="960" fill="#F8FAFC"/>
+
+  <!-- Title -->
+  <text x="400" y="34" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="17" font-weight="700" fill="#0F172A" letter-spacing="-0.3">Greenfield Workflow</text>
+  <text x="400" y="52" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Starting a new project with governance from day one</text>
+
+  <!-- ── START ── -->
+  <rect x="280" y="68" width="240" height="40" rx="20"
+    fill="#1E293B" filter="url(#sh)"/>
+  <text x="400" y="93" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="600" fill="#F8FAFC">New Project</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="108" x2="400" y2="126" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── INSTALL & INIT ── -->
+  <rect x="100" y="128" width="600" height="76" rx="10"
+    fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="152" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#1D4ED8">Install &amp; Initialize</text>
+  <text x="400" y="170" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#3B82F6">npx slopbuster · /sb:init · Claude Code · VS Code · Cursor</text>
+  <text x="400" y="186" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Project name · core value · phases · domain steward files (optional)</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="204" x2="400" y2="222" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── DISCUSS ── -->
+  <rect x="100" y="224" width="600" height="58" rx="10"
+    fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="247" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#1D4ED8">/sb:discuss</text>
+  <text x="400" y="265" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Surface assumptions, goals, and constraints before writing any code</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="282" x2="400" y2="300" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── PLAN ── -->
+  <rect x="100" y="302" width="600" height="58" rx="10"
+    fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="325" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#1D4ED8">/sb:plan</text>
+  <text x="400" y="343" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Constraint-first plan written · Gate thresholds evaluated against scope</text>
+
+  <!-- Auto-clear callout (right side) -->
+  <rect x="712" y="302" width="76" height="58" rx="8"
+    fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="750" y="323" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="10" font-weight="600" fill="#065F46">Simple</text>
+  <text x="750" y="337" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="10" fill="#065F46">plan?</text>
+  <text x="750" y="351" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" font-weight="700" fill="#059669">Auto ✓</text>
+  <!-- Connecting line from plan right edge to callout -->
+  <line x1="700" y1="331" x2="712" y2="331" stroke="#6EE7B7" stroke-width="1.5"/>
+
+  <!-- Arrow -->
+  <line x1="400" y1="360" x2="400" y2="378" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── GATE (featured) ── -->
+  <rect x="100" y="380" width="600" height="152" rx="10"
+    fill="#FFF7ED" stroke="#FED7AA" stroke-width="2" filter="url(#sh)"/>
+  <!-- Gate accent bar -->
+  <rect x="100" y="380" width="600" height="4" rx="2" fill="#F97316"/>
+  <!-- Gate header -->
+  <text x="400" y="408" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="14" font-weight="700" fill="#9A3412">/sb:gate · Circuit Breaker</text>
+  <!-- Divider -->
+  <line x1="130" y1="418" x2="670" y2="418" stroke="#FED7AA" stroke-width="1"/>
+  <!-- Gate body -->
+  <text x="400" y="438" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" font-weight="600" fill="#C2410C">5 Architectural Questions</text>
+  <text x="400" y="455" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#92400E">Connectivity · Performance · Concurrency · Security · Rollback</text>
+  <text x="400" y="476" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#92400E">Domain stewards inject additional questions for touched domains</text>
+  <text x="400" y="492" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="10" fill="#B45309">DBA · Security · Payments · Network · Infrastructure</text>
+  <text x="400" y="512" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" font-weight="600" fill="#C2410C">Risk tier assigned · LOW · MEDIUM · HIGH · CRITICAL</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="532" x2="400" y2="550" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── CHANGE RECORD ── -->
+  <rect x="100" y="552" width="600" height="68" rx="10"
+    fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="575" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#15803D">Change Record Written</text>
+  <text x="400" y="592" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#16A34A">Saved to records/ · Verbatim answers · authorization chain · plan hash</text>
+  <text x="400" y="608" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Standalone · downloadable · future ServiceNow / Jira target</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="620" x2="400" y2="638" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── APPLY ── -->
+  <rect x="100" y="640" width="600" height="76" rx="10"
+    fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="663" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#1D4ED8">/sb:apply</text>
+  <text x="400" y="681" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#3B82F6">Execute wave by wave · constrained by your answers, not the AI's assumptions</text>
+  <text x="400" y="698" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Checkpointed · /sb:pause → /sb:resume · UAT fails → /sb:fix → new plan</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="716" x2="400" y2="734" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── UNIFY ── -->
+  <rect x="100" y="736" width="600" height="58" rx="10"
+    fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="759" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#1D4ED8">/sb:unify</text>
+  <text x="400" y="777" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Reconcile plan vs actual · SUMMARY.md written · loop closed · repeat for next plan</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="794" x2="400" y2="812" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── EXPORT ── -->
+  <rect x="100" y="814" width="600" height="58" rx="10"
+    fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="400" y="837" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="700" fill="#15803D">/sb:export</text>
+  <text x="400" y="855" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="11" fill="#64748B">Compliance evidence pack from all Change Records · SOC 2 · HIPAA · FedRAMP</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="872" x2="400" y2="890" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── DONE ── -->
+  <rect x="280" y="892" width="240" height="40" rx="20"
+    fill="#1E293B" filter="url(#sh)"/>
+  <text x="400" y="917" text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+    font-size="13" font-weight="600" fill="#F8FAFC">Phase Complete</text>
+
+  <!-- ── LEGEND ── -->
+  <rect x="100" y="940" width="600" height="12" rx="6" fill="none"/>
+  <rect x="100" y="943" width="12" height="12" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+  <text x="118" y="954" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10" fill="#64748B">Command</text>
+  <rect x="186" y="943" width="12" height="12" rx="3" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="204" y="954" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10" fill="#64748B">Gate / Circuit Breaker</text>
+  <rect x="316" y="943" width="12" height="12" rx="3" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="334" y="954" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10" fill="#64748B">Artifact / Output</text>
+  <rect x="432" y="943" width="12" height="12" rx="3" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="450" y="954" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10" fill="#64748B">Auto-cleared</text>
+</svg>
