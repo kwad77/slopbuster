@@ -53,6 +53,41 @@ If no override:
 **If `gate_cleared: true`:**
 Verify GATE.md exists at the expected path. If missing, warn but continue.
 
+### 3b. Routing approval check
+
+Read `risk_tier` and `approved_by` from PLAN.md frontmatter.
+Read `routing:` from `.slopbuster/config.md`.
+
+**If `routing.enabled: false` (default):** skip this step.
+
+**If `routing.enabled: true`:**
+
+| Tier | Requirement | Block? |
+|------|-------------|--------|
+| LOW | none | no |
+| MEDIUM | `approved_by` populated | advisory only |
+| HIGH | `approved_by` populated | warn if empty |
+| CRITICAL | `approved_by` populated | block if empty |
+
+For CRITICAL with empty `approved_by`:
+```
+⛔ Routing block — approval required.
+
+This plan is CRITICAL risk and routing is enabled.
+Approver required: [config.routing.critical]
+
+Set approved_by and approval_date in PLAN.md frontmatter, then re-run /sb:apply.
+Or type 'override' to bypass (logged to STATE.md Decisions).
+```
+
+For HIGH with empty `approved_by`: warn but do not block.
+```
+⚠ Routing advisory — HIGH risk plan.
+Recommended approver: [config.routing.high]
+Set approved_by in PLAN.md to document sign-off.
+Proceeding — routing.high does not block (set routing.critical to block).
+```
+
 ### 4. Load constraints
 
 Read the `<constraints>` section of PLAN.md.

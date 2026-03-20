@@ -12,6 +12,18 @@ gate:
 enterprise_audit:
   enabled: false
 
+routing:
+  enabled: false            # Set true to activate risk-tier routing
+  # When enabled, plans are routed based on risk_tier before APPLY can proceed.
+  # Fill in team names, Slack handles, or email aliases — these are display values.
+  # Enforcement is advisory until Goal 2 (SSO/identity) is implemented.
+  low:      auto            # LOW tier — proceeds automatically
+  medium:   auto            # MEDIUM tier — developer self-approves
+  high:     ""              # HIGH tier — team or individual who must approve (e.g. "arch-review@company.com")
+  critical: ""              # CRITICAL tier — senior sign-off required (e.g. "cto@company.com")
+  # Future: SSO integration will bind these to authenticated identities.
+  # Today: populates approved_by in PLAN.md as a documented record.
+
 stewards:
   enabled: false            # Set true to activate domain stewardship import at Gate time
   directory: .slopbuster/stewards/

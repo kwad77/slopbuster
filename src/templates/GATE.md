@@ -21,6 +21,8 @@
 **Plan hash:** [sha256 of plan content at gate time]
 **Timestamp:** [ISO timestamp]
 **Steward files active:** none
+**Routing:** auto
+**Approved by:** pending
 
 ---
 

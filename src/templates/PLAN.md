@@ -12,6 +12,8 @@ gate_triggered_by: ""
 risk_tier: LOW
 domain: []
 steward_files: []
+approved_by: ""
+approval_date: null
 ---
 
 <constraints>

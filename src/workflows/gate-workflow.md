@@ -266,6 +266,30 @@ Set:
   - auth-session + (database-schema or api-contract) → CRITICAL
 - `domain: [list of detected domains]`
 - `steward_files: [list of steward files that were active, or []]`
+- `approved_by: ""` — leave empty; populated when routing approval is given
+- `approval_date: null`
+
+### 8b. Routing advisory
+
+Read `routing:` from `.slopbuster/config.md`.
+
+**If `routing.enabled: false` (default):**
+- Note routing is disabled — no advisory shown.
+
+**If `routing.enabled: true`:**
+
+Display the routing decision based on `risk_tier`:
+
+| Tier | Action |
+|------|--------|
+| LOW | `[ROUTE → auto] No approval required. Proceed with /sb:apply.` |
+| MEDIUM | `[ROUTE → self] Developer self-approval. Set approved_by in PLAN.md frontmatter, then run /sb:apply.` |
+| HIGH | `[ROUTE → review] Requires approval from: [config.routing.high]. Set approved_by and approval_date in PLAN.md, then run /sb:apply.` |
+| CRITICAL | `[ROUTE → escalate] Requires senior sign-off from: [config.routing.critical]. Set approved_by and approval_date in PLAN.md, then run /sb:apply.` |
+
+For HIGH and CRITICAL, update STATE.md Next: to show approval step before `/sb:apply`.
+
+Note clearly: routing enforcement is advisory until SSO/identity integration (Goal 2). `approved_by` is a documented record, not a cryptographic identity assertion.
 
 Also write the Risk Classification and Attribution sections of GATE.md:
 
