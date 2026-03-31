@@ -30,5 +30,7 @@ npm-debug.log*
 # SlopBuster user project state (generated at runtime)
 .slopbuster/
 
-# Session / handoff context (internal dev notes)
+# Internal dev notes (session context, design docs)
 HANDOFF.md
+CLAUDE.md
+PLAN.md
