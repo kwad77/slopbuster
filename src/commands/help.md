@@ -55,6 +55,7 @@ PLAN ──▶ GATE ──▶ APPLY ──▶ UNIFY
 
 | Command | Purpose |
 |---------|---------|
+| `/sb:greenfield` | Office hours — challenge whether a new project should exist before building it |
 | `/sb:discuss [phase]` | Articulate vision, surface assumptions before planning |
 | `/sb:research [topic]` | Deploy research agent for external information |
 

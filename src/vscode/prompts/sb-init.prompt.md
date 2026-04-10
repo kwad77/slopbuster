@@ -64,7 +64,13 @@ Initialize SlopBuster in this project by creating the `.slopbuster/` directory s
      enabled: false
    ```
 
-4. Confirm:
+4. If this looks like a greenfield project (near-empty directory, no existing application code), suggest:
+   ```
+   This looks like a new project. Consider running greenfield office hours first:
+     /sb-greenfield — challenge whether this project should exist before building it
+   ```
+
+5. Confirm:
    ```
    ✓ SlopBuster initialized
 
@@ -73,5 +79,7 @@ Initialize SlopBuster in this project by creating the `.slopbuster/` directory s
    ├── STATE.md     — loop position
    └── config.md    — settings
 
-   Next: /sb-plan — write your first constraint-first plan
+   Next:
+     /sb-greenfield — challenge whether this project should exist (new projects)
+     /sb-plan       — write your first constraint-first plan
    ```

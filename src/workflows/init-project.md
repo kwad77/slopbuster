@@ -4,6 +4,39 @@ Initialize SlopBuster in the current project.
 
 ## Steps
 
+### 0. Greenfield check
+
+Before initializing, check whether this is a brand-new project (empty or near-empty directory — fewer than 5 source files, no existing application code). Also check if `.slopbuster/GREENFIELD-*.md` exists.
+
+**If the directory is near-empty AND no GREENFIELD assessment exists:**
+
+```
+This looks like a greenfield project — no existing codebase to work with.
+
+Before initializing, consider running office hours to challenge whether
+this project should exist at all:
+
+  /sb:greenfield
+
+This asks the tough questions: Does this problem need a custom solution?
+What already exists? Who are the actual users? What's the kill criteria?
+
+Skip this if you've already done your homework:  type "skip" to proceed to init.
+```
+
+Wait for the developer to respond. If they say "skip" or want to proceed, continue to step 1. If they want to run greenfield first, stop here — they'll come back to `/sb:init` after.
+
+**If a GREENFIELD assessment exists:** Read it. Show the verdict. If RED or ORANGE, warn:
+
+```
+⚠ Your greenfield assessment gave a [verdict] verdict.
+  Reason: [one-line summary]
+
+  Proceeding anyway? The assessment recommended: [recommendation]
+```
+
+Continue only if the developer confirms.
+
 ### 1. Check for existing installation
 
 Check if `.slopbuster/` already exists in the current directory.
@@ -165,6 +198,7 @@ Phases:     [N phases created]
 Git:        [tracked | ignored]
 
 Next:
+  /sb:greenfield        — challenge whether this project should exist (new projects)
   /sb:discuss [phase]   — surface assumptions before planning (recommended)
   /sb:plan [phase]      — create your first plan directly
 ```
