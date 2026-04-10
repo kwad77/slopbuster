@@ -129,6 +129,7 @@ No build step. No compilation. No runtime. SlopBuster is markdown files your edi
 ## Quick Start
 
 ```
+/sb:greenfield  Challenge whether this project should exist (new projects)
 /sb:init        Scaffold .slopbuster/ in your project (30 seconds)
 /sb:discuss     Surface assumptions before writing the plan
 /sb:plan        Write a constraint-first plan — Gate thresholds evaluated
@@ -139,6 +140,18 @@ No build step. No compilation. No runtime. SlopBuster is markdown files your edi
 
 What this looks like in practice:
 
+**New project (greenfield):**
+```
+/sb:greenfield     → 7 tough questions — should this project exist at all?
+                   → verdict: GREEN / YELLOW / ORANGE / RED
+/sb:init           → .slopbuster/ scaffolded
+/sb:plan           → PLAN.md created, <constraints> visibly empty
+/sb:gate           → 5 questions, answers injected verbatim
+/sb:apply          → executes wave by wave, checkpointed
+/sb:unify          → loop closed, SUMMARY.md written
+```
+
+**Existing codebase:**
 ```
 /sb:init           → .slopbuster/ scaffolded
 /sb:plan           → PLAN.md created, <constraints> visibly empty
@@ -151,7 +164,7 @@ What this looks like in practice:
 
 ---
 
-## All 17 Commands
+## All 18 Commands
 
 ### Core Loop
 | Command | What it does |
@@ -173,6 +186,7 @@ What this looks like in practice:
 ### Pre-Planning
 | Command | What it does |
 |---------|-------------|
+| `/sb:greenfield` | Office hours — challenge whether a new project should exist before building it |
 | `/sb:discuss [phase]` | Articulate vision and surface assumptions before planning |
 | `/sb:research [topic]` | Deploy a research agent for external information gathering |
 
